@@ -60,7 +60,7 @@ define([
                 },
 
                 /**
-                 * Remove custom option or option row for 'select' type of custom option
+                 * Remove description
                  */
                 'click button[id^=product_custom_description_][id$=_delete]': function (event) {
                     var element = $(event.target).closest('#product_custom_description_container_top > div.fieldset-wrapper,tr');
@@ -86,7 +86,7 @@ define([
         },
 
         /**
-         * Update Custom option position
+         * Update description position
          */
         _updateDescriptionBoxPositions: function () {
             $(this).find('div[id^=description_]:not(.ignore-validate) .fieldset-alt > [name$="[sort_order]"]').each(function (index) {
@@ -133,10 +133,6 @@ define([
             }
 
             return this;
-        },
-
-        getFreeOptionId: function (id) {
-            return $('#' + this.options.fieldId + '_' + id).length ? this.getFreeOptionId(parseInt(id, 10) + 1) : id;
         }
     });
 
