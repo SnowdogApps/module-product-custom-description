@@ -5,7 +5,6 @@ namespace Snowdog\CustomDescription\Block\Catalog\Product\View;
 use Magento\Catalog\Block\Product\View\AbstractView;
 use Magento\Catalog\Block\Product\Context;
 use Magento\Framework\Stdlib\ArrayUtils;
-use Magento\Framework\Filesystem;
 
 class CustomDescription extends AbstractView
 {
@@ -21,17 +20,14 @@ class CustomDescription extends AbstractView
      * @param ArrayUtils $arrayUtils
      * @param array $data
      * @param \Snowdog\CustomDescription\Model\Resource\CustomDescription $customDescription
-     * @param Filesystem $filesystem
      */
     public function __construct(
         Context $context,
         ArrayUtils $arrayUtils,
         array $data,
-        \Snowdog\CustomDescription\Model\Resource\CustomDescription $customDescription,
-        Filesystem $filesystem
+        \Snowdog\CustomDescription\Model\Resource\CustomDescription $customDescription
     ) {
         $this->ddResourceModel = $customDescription;
-        $this->filesystem = $filesystem;
 
         parent::__construct($context, $arrayUtils, $data);
     }
