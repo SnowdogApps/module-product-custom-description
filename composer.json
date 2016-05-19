@@ -1,9 +1,9 @@
 {
-    "name": "snowdog/snowdog-product-custom-description",
+    "name": "snowdog/module-product-custom-description",
     "version": "dev-master",
     "source": {
         "type": "git",
-        "url": "https://github.com/SnowdogApps/snowdog-product-custom-description.git",
+        "url": "https://github.com/SnowdogApps/module-product-custom-description.git",
         "reference": "origin/master"
     },
     "require": {

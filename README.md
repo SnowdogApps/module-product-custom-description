@@ -1,4 +1,4 @@
-# Snowdog Product Custom Description Tab
+# Snowdog Product Custom Description Tab for Magento 2
 
 ## What is this code for?
 
