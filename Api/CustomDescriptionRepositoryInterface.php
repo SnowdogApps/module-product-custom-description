@@ -1,0 +1,39 @@
+<?php
+
+namespace Snowdog\CustomDescription\Api;
+
+use Magento\Framework\Exception\NoSuchEntityException;
+
+/**
+ * Custom Description repository interface
+ *
+ * @api
+ */
+interface CustomDescriptionRepositoryInterface
+{
+
+    /**
+     * Retrieve a custom description by id
+     *
+     * @param int $id
+     * @return \Snowdog\CustomDescription\Api\Data\CustomDescriptionInterface
+     * @throws NoSuchEntityException
+     */
+    public function get($id);
+
+    /**
+     * Retrieve list of all custom descriptions
+     *
+     * @return \Snowdog\CustomDescription\Api\Data\CustomDescriptionInterface[]
+     */
+    public function getAll();
+
+    /**
+     * Retrieve list of custom descriptions by product id
+     *
+     * @param int $productId
+     * @return \Snowdog\CustomDescription\Api\Data\CustomDescriptionInterface[]
+     */
+    public function getCustomDescriptionByProductId($productId);
+
+}

@@ -5,7 +5,7 @@
         <referenceBlock name="product_tabs">
             <block class="Magento\Backend\Block\Widget\Tab" name="product.custom.description">
                 <arguments>
-                    <argument name="label" xsi:type="string" translate="true">Custom Description</argument>
+                    <argument name="label" xsi:type="string" translate="true">Structured Description</argument>
                     <argument name="url" xsi:type="url" path="snowcustomdescription/custom/description">
                         <param name="_current">1</param>
                     </argument>

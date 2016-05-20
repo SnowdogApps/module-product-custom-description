@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+
+<config>
+    <type name="Magento\Catalog\Controller\Adminhtml\Product\Save">
+        <plugin name="snowcustomdescription_plugin_product_save_after"
+                type="Snowdog\CustomDescription\Plugin\Adminhtml\ProductSave"
+                sortOrder="1" />
+    </type>
+</config>

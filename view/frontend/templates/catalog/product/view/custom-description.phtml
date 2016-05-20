@@ -6,20 +6,34 @@ $customDescription = $block->getCustomDescription();
     <div class="block block-custom-description">
         <div class="block-title title">
             <strong id="block-custom-description-heading">
-                <?php echo __("Custom Description") ?>
+                <?php echo __("Structured Description") ?>
             </strong>
         </div>
         <div class="block-content content">
-            <?php foreach($customDescription as $d): ?>
-                <div class="block block-item-custom-description">
-                    <div class="img-item-custom-description">
-                        <img src="/media/<?php echo $d['image']; ?>" title="<?php echo $d['title']; ?>" alt="<?php echo $d['title']; ?>"/>
-                    </div>
-                    <div class="text-item-custom-description">
-                        <?php echo $d['description']; ?>
-                    </div>
-                </div>
-            <?php endforeach; ?>
+            <table>
+                <thead>
+                    <tr>
+                        <th><?php echo __("Image"); ?></th>
+                        <th><?php echo __("Description"); ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach($customDescription as $d): ?>
+                        <tr>
+                            <td>
+                                <div class="img-item-custom-description">
+                                    <img style="width:200px;" src="/media/<?php echo $d['image']; ?>" title="<?php echo $d['title']; ?>" alt="<?php echo $d['title']; ?>"/>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="text-item-custom-description">
+                                    <?php echo $d['description']; ?>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
         </div>
     </div>
 <?php endif;?>

@@ -5,42 +5,41 @@ namespace Snowdog\CustomDescription\Block\Catalog\Product\View;
 use Magento\Catalog\Block\Product\View\AbstractView;
 use Magento\Catalog\Block\Product\Context;
 use Magento\Framework\Stdlib\ArrayUtils;
+use Snowdog\CustomDescription\Model\CustomDescriptionRepository;
 
 class CustomDescription extends AbstractView
 {
 
-    /**
-     * @var \Snowdog\CustomDescription\Model\Resource\CustomDescription
-     */
-    protected $ddResourceModel;
+    protected $customDescriptionRepository;
 
     /**
      * CustomDescription constructor.
+     *
      * @param Context $context
      * @param ArrayUtils $arrayUtils
      * @param array $data
-     * @param \Snowdog\CustomDescription\Model\Resource\CustomDescription $customDescription
+     * @param CustomDescriptionRepository $customDescriptionRepository
      */
     public function __construct(
         Context $context,
         ArrayUtils $arrayUtils,
         array $data,
-        \Snowdog\CustomDescription\Model\Resource\CustomDescription $customDescription
+        CustomDescriptionRepository $customDescriptionRepository
     ) {
-        $this->ddResourceModel = $customDescription;
+        $this->customDescriptionRepository = $customDescriptionRepository;
 
         parent::__construct($context, $arrayUtils, $data);
     }
 
     /**
-     * Get custom description for the current product
+     * Retrieve custom description for the current product
      *
-     * @return mixed
+     * @return \Snowdog\CustomDescription\Api\Data\CustomDescriptionInterface[]
      */
     public function getCustomDescription()
     {
         $currentProductId = $this->getProduct()->getId();
-        $customDescription = $this->ddResourceModel
+        $customDescription = $this->customDescriptionRepository
             ->getCustomDescriptionByProductId($currentProductId);
 
         return $customDescription;

@@ -9,7 +9,7 @@ class CustomDescription extends Widget
     /**
      * @var string
      */
-    protected $_template = 'snowcustomdescription/catalog/product/edit/tab/custom_description.phtml';
+    protected $_template = 'catalog/product/edit/tab/custom_description.phtml';
 
     /**
      * @return Widget
