@@ -8,7 +8,7 @@ Also, the extension shows in product page (front end) the list of custom descrip
 
 ## How to install.
 
-Just type the following under your Magento 2 root directory:
+Just type the following terminal command under your Magento 2 root directory:
 
 ```
 composer require snowdog/module-product-custom-description
