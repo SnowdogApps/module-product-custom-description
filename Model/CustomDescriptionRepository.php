@@ -6,6 +6,7 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Snowdog\CustomDescription\Api\CustomDescriptionRepositoryInterface;
 use Snowdog\CustomDescription\Model\Resource\CustomDescription\CollectionFactory;
 use Snowdog\CustomDescription\Model\CustomDescriptionFactory;
+use Snowdog\CustomDescription\Model\Resource\CustomDescription;
 
 class CustomDescriptionRepository
     implements CustomDescriptionRepositoryInterface
@@ -37,17 +38,25 @@ class CustomDescriptionRepository
     protected $customDescriptionCollectionFactory;
 
     /**
+     * @var CustomDescription
+     */
+    protected $resource;
+
+    /**
      * CustomDescriptionRepository constructor.
      *
-     * @param CustomDescriptionFactory $customDescriptionFactory
+     * @param \Snowdog\CustomDescription\Model\CustomDescriptionFactory $customDescriptionFactory
      * @param CollectionFactory $customDescriptionCollectionFactory
+     * @param CustomDescription $customDescriptionResource
      */
     public function __construct(
         CustomDescriptionFactory $customDescriptionFactory,
-        CollectionFactory $customDescriptionCollectionFactory
+        CollectionFactory $customDescriptionCollectionFactory,
+        CustomDescription $customDescriptionResource
     ) {
         $this->customDescriptionFactory = $customDescriptionFactory;
         $this->customDescriptionCollectionFactory = $customDescriptionCollectionFactory;
+        $this->resource = $customDescriptionResource;
     }
 
     /**
@@ -117,4 +126,17 @@ class CustomDescriptionRepository
         return $customDescriptionCollection;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function save(\Snowdog\CustomDescription\Api\Data\CustomDescriptionInterface $customDescription)
+    {
+        try {
+            $this->resource->save($customDescription);
+        } catch (\Exception $exception) {
+            throw new CouldNotSaveException(__($exception->getMessage()));
+        }
+
+        return $customDescription;
+    }
 }

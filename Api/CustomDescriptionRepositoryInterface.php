@@ -36,4 +36,13 @@ interface CustomDescriptionRepositoryInterface
      */
     public function getCustomDescriptionByProductId($productId);
 
+    /**
+     * Save a custom description
+     *
+     * @param Data\CustomDescriptionInterface $customDescription
+     * @return \Snowdog\CustomDescription\Api\Data\CustomDescriptionInterface
+     * @throws \Magento\Framework\Exception\CouldNotSaveException
+     */
+    public function save(\Snowdog\CustomDescription\Api\Data\CustomDescriptionInterface $customDescription);
+
 }

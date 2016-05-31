@@ -2,7 +2,6 @@
 
 namespace Snowdog\CustomDescription\Plugin\Adminhtml;
 
-use Magento\Framework\ObjectManagerInterface ;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Framework\Image\AdapterFactory;
 use Magento\MediaStorage\Model\File\UploaderFactory;
@@ -12,14 +11,10 @@ use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Registry;
 use Magento\Catalog\Controller\Adminhtml\Product\Save\Interceptor;
 use Magento\Backend\Model\View\Result\Redirect\Interceptor as RedirectInterceptor;
+use Snowdog\CustomDescription\Model\CustomDescriptionFactory;
 
 class ProductSave
 {
-
-    /**
-     * @var \Magento\Framework\App\ObjectManager
-     */
-    private $_objectManager;
 
     /**
      * @var ManagerInterface
@@ -52,32 +47,37 @@ class ProductSave
     private $registry;
 
     /**
+     * @var CustomDescriptionFactory
+     */
+    private $customDescriptionFactory;
+
+    /**
      * ProductSave constructor.
      *
-     * @param ObjectManagerInterface $objectManager
      * @param ManagerInterface $messageManager
      * @param AdapterFactory $adapterFactory
      * @param UploaderFactory $uploader
      * @param Filesystem $filesystem
      * @param RequestInterface $request
      * @param Registry $registry
+     * @param CustomDescriptionFactory $customDescriptionFactory
      */
     public function __construct(
-        ObjectManagerInterface $objectManager,
         ManagerInterface $messageManager,
         AdapterFactory $adapterFactory,
         UploaderFactory $uploader,
         Filesystem $filesystem,
         RequestInterface $request,
-        Registry $registry
+        Registry $registry,
+        CustomDescriptionFactory $customDescriptionFactory
     ) {
-        $this->_objectManager = $objectManager;
         $this->_messageManager = $messageManager;
         $this->adapterFactory = $adapterFactory;
         $this->uploader = $uploader;
         $this->filesystem = $filesystem;
         $this->request = $request;
         $this->registry = $registry;
+        $this->customDescriptionFactory = $customDescriptionFactory;
     }
 
     /**
@@ -99,7 +99,7 @@ class ProductSave
 
             if (is_array($customDescData) && !empty($productId)) {
                 /* @var $customDescription \Snowdog\CustomDescription\Model\CustomDescription */
-                $customDescription = $this->_objectManager->create('Snowdog\CustomDescription\Model\CustomDescription');
+                $customDescription = $this->customDescriptionFactory->create();
 
                 foreach ($customDescData as $detDesc) {
                     if ($this->validateCustomDescData($detDesc)) {

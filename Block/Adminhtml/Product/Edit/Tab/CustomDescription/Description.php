@@ -18,7 +18,7 @@ class Description extends Widget
     /**
      * @var string
      */
-    protected $_template = 'catalog/product/edit/tab/custom_description/description.phtml';
+    protected $_template = 'catalog/product/edit/tab/description.phtml';
 
     /**
      * Core registry
