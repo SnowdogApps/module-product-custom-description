@@ -101,7 +101,7 @@
             )?>);
 
             <?php foreach($this->getCustomDescription() as $detDesc): ?>
-                fieldSet.customDescription('addDescription', <?php echo json_encode($detDesc) ?>);
+                fieldSet.customDescription('addDescription', <?php /* @escapeNotVerified */ echo $detDesc->toJson() ?>);
             <?php endforeach; ?>
         });
     });

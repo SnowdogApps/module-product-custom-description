@@ -6,8 +6,13 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Snowdog\CustomDescription\Api\CustomDescriptionRepositoryInterface;
 use Snowdog\CustomDescription\Model\Resource\CustomDescription\CollectionFactory;
 use Snowdog\CustomDescription\Model\CustomDescriptionFactory;
-use Snowdog\CustomDescription\Model\Resource\CustomDescription;
+use Snowdog\CustomDescription\Model\Resource\CustomDescription as CustomDescriptionResource;
 
+/**
+ * Class CustomDescriptionRepository
+ * 
+ * @package Snowdog\CustomDescription\Model
+ */
 class CustomDescriptionRepository
     implements CustomDescriptionRepositoryInterface
 {
@@ -38,7 +43,7 @@ class CustomDescriptionRepository
     protected $customDescriptionCollectionFactory;
 
     /**
-     * @var CustomDescription
+     * @var CustomDescriptionResource
      */
     protected $resource;
 
@@ -52,7 +57,7 @@ class CustomDescriptionRepository
     public function __construct(
         CustomDescriptionFactory $customDescriptionFactory,
         CollectionFactory $customDescriptionCollectionFactory,
-        CustomDescription $customDescriptionResource
+        CustomDescriptionResource $customDescriptionResource
     ) {
         $this->customDescriptionFactory = $customDescriptionFactory;
         $this->customDescriptionCollectionFactory = $customDescriptionCollectionFactory;

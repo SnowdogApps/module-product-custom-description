@@ -7,6 +7,11 @@ use Magento\Catalog\Block\Product\Context;
 use Magento\Framework\Stdlib\ArrayUtils;
 use Snowdog\CustomDescription\Model\CustomDescriptionRepository;
 
+/**
+ * Class CustomDescription
+ * 
+ * @package Snowdog\CustomDescription\Block\Catalog\Product\View
+ */
 class CustomDescription extends AbstractView
 {
 
@@ -34,7 +39,7 @@ class CustomDescription extends AbstractView
     /**
      * Retrieve custom description for the current product
      *
-     * @return \Snowdog\CustomDescription\Api\Data\CustomDescriptionInterface[]
+     * @return \Snowdog\CustomDescription\Model\Resource\CustomDescription\Collection
      */
     public function getCustomDescription()
     {

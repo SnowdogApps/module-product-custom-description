@@ -4,12 +4,17 @@ namespace Snowdog\CustomDescription\Block\Adminhtml\Product\Edit\Tab;
 
 use Magento\Backend\Block\Widget;
 
+/**
+ * Class CustomDescription
+ *
+ * @package Snowdog\CustomDescription\Block\Adminhtml\Product\Edit\Tab
+ */
 class CustomDescription extends Widget
 {
     /**
      * @var string
      */
-    protected $_template = 'catalog/product/edit/tab/custom_description.phtml';
+    protected $_template = 'Snowdog_CustomDescription::catalog/product/edit/tab/custom-description.phtml';
 
     /**
      * @return Widget

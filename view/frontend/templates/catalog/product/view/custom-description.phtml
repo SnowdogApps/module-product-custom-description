@@ -1,8 +1,9 @@
 <?php
 /** @var $block \Snowdog\CustomDescription\Block\Catalog\Product\View\CustomDescription */
+/** @var $customDescription \Snowdog\CustomDescription\Model\Resource\CustomDescription\Collection */
 $customDescription = $block->getCustomDescription();
 ?>
-<?php if (count($customDescription)) : ?>
+<?php if ($customDescription->getSize()) : ?>
     <div class="block block-custom-description">
         <div class="block-title title">
             <strong id="block-custom-description-heading">
@@ -22,12 +23,12 @@ $customDescription = $block->getCustomDescription();
                         <tr>
                             <td>
                                 <div class="img-item-custom-description">
-                                    <img style="width:200px;" src="/media/<?php echo $d['image']; ?>" title="<?php echo $d['title']; ?>" alt="<?php echo $d['title']; ?>"/>
+                                    <img style="width:200px;" src="/media/<?php echo $d->getData('image'); ?>" title="<?php echo $d->getData('title'); ?>" alt="<?php echo $d->getData('title'); ?>"/>
                                 </div>
                             </td>
                             <td>
                                 <div class="text-item-custom-description">
-                                    <?php echo $d['description']; ?>
+                                    <?php echo $d->getData('description'); ?>
                                 </div>
                             </td>
                         </tr>

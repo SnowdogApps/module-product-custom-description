@@ -5,6 +5,11 @@ namespace Snowdog\CustomDescription\Model;
 use Magento\Framework\Model\AbstractModel;
 use Snowdog\CustomDescription\Api\Data\CustomDescriptionInterface;
 
+/**
+ * Class CustomDescription
+ * 
+ * @package Snowdog\CustomDescription\Model
+ */
 class CustomDescription
     extends AbstractModel
     implements CustomDescriptionInterface

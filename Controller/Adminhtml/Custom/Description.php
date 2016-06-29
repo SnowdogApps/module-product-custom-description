@@ -10,6 +10,11 @@ use Magento\Backend\App\Action\Context;
 use Magento\Framework\View\Result\LayoutFactory;
 use Magento\Backend\App\Action;
 
+/**
+ * Class Description
+ * 
+ * @package Snowdog\CustomDescription\Controller\Adminhtml\Custom
+ */
 class Description extends Action
 {
 

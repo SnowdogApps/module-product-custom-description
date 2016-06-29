@@ -8,6 +8,11 @@ use Magento\Framework\Registry;
 use Magento\Backend\Block\Template\Context;
 use Snowdog\CustomDescription\Model\Resource\CustomDescription;
 
+/**
+ * Class Description
+ *
+ * @package Snowdog\CustomDescription\Block\Adminhtml\Product\Edit\Tab\CustomDescription
+ */
 class Description extends Widget
 {
     /**
@@ -18,7 +23,7 @@ class Description extends Widget
     /**
      * @var string
      */
-    protected $_template = 'catalog/product/edit/tab/description.phtml';
+    protected $_template = 'Snowdog_CustomDescription::catalog/product/edit/tab/description.phtml';
 
     /**
      * Core registry

@@ -3,9 +3,18 @@
 namespace Snowdog\CustomDescription\Model\Resource;
 
 use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
+use Snowdog\CustomDescription\Model\Resource\CustomDescription\CollectionFactory;
+use Magento\Framework\Model\ResourceModel\Db\Context;
 
+/**
+ * Class CustomDescription
+ *
+ * @package Snowdog\CustomDescription\Model\Resource
+ */
 class CustomDescription extends AbstractDb
 {
+
+    protected $collectionFactory;
 
     /**
      * Define main table and key
@@ -16,27 +25,40 @@ class CustomDescription extends AbstractDb
     }
 
     /**
+     * CustomDescription constructor.
+     *
+     * @param Context $context
+     * @param null|string $connectionName
+     * @param $collectionFactory $categoryCollectionFactory
+     */
+    public function __construct(
+        Context $context,
+        CollectionFactory $collectionFactory,
+        $connectionName = null
+    ) {
+        parent::__construct($context, $connectionName);
+
+        $this->collectionFactory = $collectionFactory;
+    }
+
+    /**
      * Get custom description list form a given product id
      *
      * @param $productId
      *
-     * @return array
+     * @return \Snowdog\CustomDescription\Model\Resource\CustomDescription\Collection
      *
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getCustomDescriptionByProductId($productId)
     {
-        $select = $this->getConnection()
-            ->select()
-            ->from([
-                'cd' => $this->getMainTable()
-            ])
-            ->where('cd.product_id = ?', $productId)
-            ->order('position ASC');
+        $collection = $this->collectionFactory->create();
+        $collection->addFieldToFilter(
+            'product_id',
+            (int)$productId
+        );
 
-        return $this
-            ->getConnection()
-            ->fetchAssoc($select);
+        return $collection;
     }
 
 }

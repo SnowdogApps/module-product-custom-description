@@ -13,6 +13,11 @@ use Magento\Catalog\Controller\Adminhtml\Product\Save\Interceptor;
 use Magento\Backend\Model\View\Result\Redirect\Interceptor as RedirectInterceptor;
 use Snowdog\CustomDescription\Model\CustomDescriptionFactory;
 
+/**
+ * Class ProductSave
+ * 
+ * @package Snowdog\CustomDescription\Plugin\Adminhtml
+ */
 class ProductSave
 {
 
