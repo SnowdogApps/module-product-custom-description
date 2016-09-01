@@ -7,6 +7,7 @@ use Snowdog\CustomDescription\Api\CustomDescriptionRepositoryInterface;
 use Snowdog\CustomDescription\Model\Resource\CustomDescription\CollectionFactory;
 use Snowdog\CustomDescription\Model\CustomDescriptionFactory;
 use Snowdog\CustomDescription\Model\Resource\CustomDescription as CustomDescriptionResource;
+use Magento\Framework\Exception\CouldNotSaveException;
 
 /**
  * Class CustomDescriptionRepository
