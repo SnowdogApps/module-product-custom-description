@@ -1,6 +1,5 @@
 {
     "name": "snowdog/module-product-custom-description",
-    "version": "dev-master",
     "source": {
         "type": "git",
         "url": "https://github.com/SnowdogApps/module-product-custom-description.git",
