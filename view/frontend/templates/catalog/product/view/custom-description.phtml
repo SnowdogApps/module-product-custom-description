@@ -23,7 +23,7 @@ $customDescription = $block->getCustomDescription();
                         <tr>
                             <td>
                                 <div class="img-item-custom-description">
-                                    <img style="width:200px;" src="/media/<?php echo $d->getData('image'); ?>" title="<?php echo $d->getData('title'); ?>" alt="<?php echo $d->getData('title'); ?>"/>
+                                    <img style="width:200px;" src="<?php echo $block->getImageSrc($d->getData('image')); ?>" title="<?php echo $d->getData('title'); ?>" alt="<?php echo $d->getData('title'); ?>"/>
                                 </div>
                             </td>
                             <td>

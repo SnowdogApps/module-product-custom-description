@@ -2,6 +2,7 @@
 
 namespace Snowdog\CustomDescription\Plugin\Adminhtml;
 
+use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Framework\Image\AdapterFactory;
 use Magento\MediaStorage\Model\File\UploaderFactory;
@@ -100,7 +101,7 @@ class ProductSave
 
         if ($product) {
             $productId = $product->getId();
-            $customDescData = $params['product']['custom_description'];
+            $customDescData = isset($params['product']['descriptions']) ? $params['product']['descriptions'] : false;
 
             if (is_array($customDescData) && !empty($productId)) {
                 /* @var $customDescription \Snowdog\CustomDescription\Model\CustomDescription */
@@ -120,10 +121,13 @@ class ProductSave
                             $item = $customDescription;
                         }
 
-                        $file = $this->uploadImage($detDesc['id'], $productId);
+                        $logger = ObjectManager::getInstance()->create('Psr\Log\LoggerInterface');
+                        $logger->debug(print_r($detDesc, true));
 
-                        if ($file || $item->getId()) {
-                            $sortOrder = isset($detDesc['sort_order']) ? $detDesc['sort_order'] : 0;
+                        $file = isset($detDesc['file'][0]['file']) ? $detDesc['file'][0]['file'] : false;
+
+                        if (isset($detDesc['file']) || $item->getId()) {
+                            $sortOrder = isset($detDesc['position']) ? $detDesc['position'] : 0;
                             $item->setData('description', $detDesc['description']);
                             $item->setData('title', $detDesc['title']);
                             $item->setData('product_id', $productId);
@@ -137,7 +141,7 @@ class ProductSave
                                 $item->save();
                                 $item->unsetData();
                             } catch (\Exception $e) {
-                                $this->_messageManager->addError(__("Couldn't save changes on custom description"));
+                                $this->_messageManager->addError(__("Couldn't save changes on custom description " . $e->getMessage()));
                             }
                         } else {
                             $this->_messageManager->addError(__("Couldn't save description {$detDesc['description_id']}. Image upload failed."));
