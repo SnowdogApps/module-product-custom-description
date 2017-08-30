@@ -2,6 +2,8 @@
 
 <layout xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/layout_generic.xsd">
     <container name="root" label="Root">
-        <block class="Snowdog\CustomDescription\Block\Adminhtml\Product\Edit\Tab\CustomDescription" name="admin.product.custom.description"/>
+        <block class="Snowdog\CustomDescription\Block\Adminhtml\Product\Edit\Tab\CustomDescription"
+               name="admin.product.custom.description"
+        />
     </container>
 </layout>

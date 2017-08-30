@@ -7,6 +7,7 @@ use Magento\Catalog\Block\Product\Context;
 use Magento\Framework\Stdlib\ArrayUtils;
 use Magento\Framework\UrlInterface;
 use Magento\Store\Model\StoreManagerInterface;
+use Snowdog\CustomDescription\Helper\Data;
 use Snowdog\CustomDescription\Model\CustomDescriptionRepository;
 use Snowdog\CustomDescription\Controller\Adminhtml\File\Upload;
 
@@ -17,6 +18,7 @@ use Snowdog\CustomDescription\Controller\Adminhtml\File\Upload;
  */
 class CustomDescription extends AbstractView
 {
+    protected $_template = 'Snowdog_CustomDescription::catalog/product/view/custom-description.phtml';
 
     /**
      * @var CustomDescriptionRepository
@@ -27,6 +29,10 @@ class CustomDescription extends AbstractView
      * @var StoreManagerInterface
      */
     private $storeManager;
+    /**
+     * @var Data
+     */
+    private $helper;
 
     /**
      * CustomDescription constructor.
@@ -36,18 +42,21 @@ class CustomDescription extends AbstractView
      * @param array $data
      * @param CustomDescriptionRepository $customDescriptionRepository
      * @param StoreManagerInterface $storeManager
+     * @param Data $helper
      */
     public function __construct(
+        CustomDescriptionRepository $customDescriptionRepository,
+        StoreManagerInterface $storeManager,
+        Data $helper,
         Context $context,
         ArrayUtils $arrayUtils,
-        array $data,
-        CustomDescriptionRepository $customDescriptionRepository,
-        StoreManagerInterface $storeManager
+        array $data = []
     ) {
         $this->customDescriptionRepository = $customDescriptionRepository;
 
         parent::__construct($context, $arrayUtils, $data);
         $this->storeManager = $storeManager;
+        $this->helper = $helper;
     }
 
     /**
@@ -70,11 +79,6 @@ class CustomDescription extends AbstractView
      */
     public function getImageSrc($image)
     {
-        $mediaUrl = $this->storeManager
-            ->getStore()
-            ->getBaseUrl(UrlInterface::URL_TYPE_MEDIA)
-            . Upload::IMAGES_UPLOAD;
-
-        return $mediaUrl . $image;
+        return $this->helper->getImageUrl($image);
     }
 }

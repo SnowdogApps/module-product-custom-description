@@ -2,17 +2,13 @@
 
 namespace Snowdog\CustomDescription\Api\Data;
 
-use Magento\Framework\Model\AbstractExtensibleModel;
-
 /**
  * Custom Description interface
  *
  * @api
  */
-interface CustomDescriptionInterface
-    extends \Magento\Framework\Api\ExtensibleDataInterface
+interface CustomDescriptionInterface extends \Magento\Framework\Api\ExtensibleDataInterface
 {
-
     /**
      * @return int
      */
@@ -78,5 +74,4 @@ interface CustomDescriptionInterface
      * @return $this
      */
     public function setPosition($position);
-    
 }

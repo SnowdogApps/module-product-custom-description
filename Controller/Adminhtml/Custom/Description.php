@@ -44,5 +44,4 @@ class Description extends Action
     {
         return $this->resultLayoutFactory->create();
     }
-
 }

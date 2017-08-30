@@ -2,8 +2,10 @@
 
 namespace Snowdog\CustomDescription\Model;
 
+use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Snowdog\CustomDescription\Api\CustomDescriptionRepositoryInterface;
+use Snowdog\CustomDescription\Api\Data;
 use Snowdog\CustomDescription\Model\Resource\CustomDescription\CollectionFactory;
 use Snowdog\CustomDescription\Model\CustomDescriptionFactory;
 use Snowdog\CustomDescription\Model\Resource\CustomDescription as CustomDescriptionResource;
@@ -14,8 +16,7 @@ use Magento\Framework\Exception\CouldNotSaveException;
  * 
  * @package Snowdog\CustomDescription\Model
  */
-class CustomDescriptionRepository
-    implements CustomDescriptionRepositoryInterface
+class CustomDescriptionRepository implements CustomDescriptionRepositoryInterface
 {
 
     /**
@@ -50,10 +51,9 @@ class CustomDescriptionRepository
 
     /**
      * CustomDescriptionRepository constructor.
-     *
      * @param \Snowdog\CustomDescription\Model\CustomDescriptionFactory $customDescriptionFactory
      * @param CollectionFactory $customDescriptionCollectionFactory
-     * @param CustomDescription $customDescriptionResource
+     * @param CustomDescriptionResource $customDescriptionResource
      */
     public function __construct(
         CustomDescriptionFactory $customDescriptionFactory,
@@ -144,5 +144,17 @@ class CustomDescriptionRepository
         }
 
         return $customDescription;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function delete(\Snowdog\CustomDescription\Api\Data\CustomDescriptionInterface $customDescription)
+    {
+        try {
+            $customDescription->delete();
+        } catch (\Exception $exception) {
+            throw new CouldNotDeleteException(__($exception->getMessage()));
+        }
     }
 }

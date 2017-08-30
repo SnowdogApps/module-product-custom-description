@@ -14,16 +14,24 @@ $customDescription = $block->getCustomDescription();
             <table>
                 <thead>
                     <tr>
-                        <th><?php echo __("Image"); ?></th>
-                        <th><?php echo __("Description"); ?></th>
+                        <th>
+                            <?php echo __("Image"); ?>
+                        </th>
+                        <th>
+                            <?php echo __("Description"); ?>
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach($customDescription as $d): ?>
+                    <?php foreach ($customDescription as $d): ?>
                         <tr>
                             <td>
                                 <div class="img-item-custom-description">
-                                    <img style="width:200px;" src="<?php echo $block->getImageSrc($d->getData('image')); ?>" title="<?php echo $d->getData('title'); ?>" alt="<?php echo $d->getData('title'); ?>"/>
+                                    <img style="width:200px;"
+                                         src="<?php echo $block->getImageSrc($d->getData('image')); ?>"
+                                         title="<?php echo $d->getData('title'); ?>"
+                                         alt="<?php echo $d->getData('title'); ?>"
+                                    />
                                 </div>
                             </td>
                             <td>

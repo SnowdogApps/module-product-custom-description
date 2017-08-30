@@ -11,7 +11,6 @@ use Magento\Framework\Exception\NoSuchEntityException;
  */
 interface CustomDescriptionRepositoryInterface
 {
-
     /**
      * Retrieve a custom description by id
      *
@@ -45,4 +44,9 @@ interface CustomDescriptionRepositoryInterface
      */
     public function save(\Snowdog\CustomDescription\Api\Data\CustomDescriptionInterface $customDescription);
 
+    /**
+     * @param Data\CustomDescriptionInterface $customDescription
+     * @return mixed
+     */
+    public function delete(\Snowdog\CustomDescription\Api\Data\CustomDescriptionInterface $customDescription);
 }

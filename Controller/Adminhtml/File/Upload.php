@@ -12,6 +12,7 @@ use Magento\MediaStorage\Model\File\UploaderFactory as FileUploaderFactory;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Image\AdapterFactory;
 use Magento\Framework\Controller\ResultFactory;
+use Snowdog\CustomDescription\Helper\Data;
 
 /**
  * Class Upload
@@ -19,8 +20,6 @@ use Magento\Framework\Controller\ResultFactory;
  */
 class Upload extends Action
 {
-    const IMAGES_UPLOAD = 'snowdog/customdescription/images';
-
     /**
      * @var FileUploaderFactory
      */
@@ -42,25 +41,33 @@ class Upload extends Action
     private $adapterFactory;
 
     /**
+     * @var Data
+     */
+    private $helper;
+
+    /**
      * Upload constructor.
      * @param Context $context
      * @param FileUploaderFactory $uploaderFactory
      * @param Filesystem $filesystem
      * @param IoFile $ioFile
      * @param AdapterFactory $adapterFactory
+     * @param Data $helper
      */
     public function __construct(
         Context $context,
         FileUploaderFactory $uploaderFactory,
         Filesystem $filesystem,
         IoFile $ioFile,
-        AdapterFactory $adapterFactory
+        AdapterFactory $adapterFactory,
+        Data $helper
     ) {
         parent::__construct($context);
         $this->uploaderFactory = $uploaderFactory;
         $this->filesystem = $filesystem;
         $this->ioFile = $ioFile;
         $this->adapterFactory = $adapterFactory;
+        $this->helper = $helper;
     }
 
     /**
@@ -82,8 +89,12 @@ class Upload extends Action
             $mediaDirectory = $this->filesystem->getDirectoryRead(DirectoryList::MEDIA);
 
             $result = $uploader->save(
-                $mediaDirectory->getAbsolutePath(self::IMAGES_UPLOAD)
+                $mediaDirectory->getAbsolutePath(Data::IMAGES_UPLOAD)
             );
+
+            if (!empty($result['file'])) {
+                $result['url'] = $this->helper->getImageUrl($result['file']);
+            }
 
             $result['cookie'] = [
                 'name' => $this->_getSession()->getName(),

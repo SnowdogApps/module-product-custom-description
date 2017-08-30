@@ -10,9 +10,7 @@ use Snowdog\CustomDescription\Api\Data\CustomDescriptionInterface;
  * 
  * @package Snowdog\CustomDescription\Model
  */
-class CustomDescription
-    extends AbstractModel
-    implements CustomDescriptionInterface
+class CustomDescription extends AbstractModel implements CustomDescriptionInterface
 {
 
     /**
@@ -118,5 +116,4 @@ class CustomDescription
     {
         return $this->setData('position', $position);
     }
-
 }

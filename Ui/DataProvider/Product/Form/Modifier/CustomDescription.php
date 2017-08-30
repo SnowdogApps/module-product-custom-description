@@ -3,14 +3,12 @@
 namespace Snowdog\CustomDescription\Ui\DataProvider\Product\Form\Modifier;
 
 use Magento\Catalog\Ui\DataProvider\Product\Form\Modifier\AbstractModifier;
-use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Stdlib\ArrayManager;
 use Magento\Ui\Component\Form\Field;
 use Magento\Ui\Component\Form\Element\Input;
 use Magento\Ui\Component\Form\Element\Textarea;
 use Magento\Ui\Component\Form\Element\ActionDelete;
 use Magento\Ui\Component\Form\Element\DataType\Text;
-use Magento\Ui\Component\Form\Element\DataType\Media;
 use Magento\Ui\Component\Form\Element\DataType\Number;
 use Magento\Ui\Component\Form\Fieldset;
 use Magento\Catalog\Model\Locator\LocatorInterface;
@@ -19,6 +17,7 @@ use Magento\Framework\UrlInterface;
 use Snowdog\CustomDescription\Api\CustomDescriptionRepositoryInterface;
 use Magento\Ui\Component\Container;
 use Magento\Ui\Component\DynamicRows;
+use Snowdog\CustomDescription\Helper\Data;
 
 /**
  * Class CustomDescription
@@ -106,24 +105,32 @@ class CustomDescription extends AbstractModifier
     private $customDescRepo;
 
     /**
+     * @var Data
+     */
+    private $helper;
+
+    /**
      * @param LocatorInterface $locator
      * @param StoreManagerInterface $storeManager
      * @param UrlInterface $urlBuilder
      * @param ArrayManager $arrayManager
      * @param CustomDescriptionRepositoryInterface $customDescRepo
+     * @param Data $helper
      */
     public function __construct(
         LocatorInterface $locator,
         StoreManagerInterface $storeManager,
         UrlInterface $urlBuilder,
         ArrayManager $arrayManager,
-        CustomDescriptionRepositoryInterface $customDescRepo
+        CustomDescriptionRepositoryInterface $customDescRepo,
+        Data $helper
     ) {
         $this->locator = $locator;
         $this->storeManager = $storeManager;
         $this->urlBuilder = $urlBuilder;
         $this->arrayManager = $arrayManager;
         $this->customDescRepo = $customDescRepo;
+        $this->helper = $helper;
     }
 
     /**
@@ -138,23 +145,24 @@ class CustomDescription extends AbstractModifier
 
         /** @var \Snowdog\CustomDescription\Api\Data\CustomDescriptionInterface $description */
         foreach ($customDescriptions as $index => $description) {;
-            $data = $description->getData() ?: [];
-            $logger = ObjectManager::getInstance()->create('Psr\Log\LoggerInterface');
-            $logger->debug(print_r($data, true));
-            $descriptions[$index] = $data;
+            $descData = $description->getData() ?: [];
+            $descData = $this->addImageData($descData);
+            $descriptions[] = $descData;
         }
 
-        return array_replace_recursive(
+        $replaced = array_replace_recursive(
             $data,
             [
                 $productId => [
                     static::DATA_SOURCE_DEFAULT => [
                         static::FIELD_ENABLE => 1,
-                        static::GRID_DESCRIPTION_NAME => []
+                        static::GRID_DESCRIPTION_NAME => $descriptions
                     ]
                 ]
             ]
         );
+
+        return $replaced;
     }
 
     /**
@@ -163,9 +171,7 @@ class CustomDescription extends AbstractModifier
     public function modifyMeta(array $meta)
     {
         $this->meta = $meta;
-
         $this->createCustomOptionsPanel();
-
         return $this->meta;
     }
 
@@ -232,7 +238,7 @@ class CustomDescription extends AbstractModifier
                     'arguments' => [
                         'data' => [
                             'config' => [
-                                'title' => __('Add Option'),
+                                'title' => __('Add Description'),
                                 'formElement' => Container::NAME,
                                 'componentType' => Container::NAME,
                                 'component' => 'Magento_Ui/js/form/components/button',
@@ -265,7 +271,6 @@ class CustomDescription extends AbstractModifier
                     'config' => [
                         'addButtonLabel' => __('Add Detailed Description'),
                         'componentType' => DynamicRows::NAME,
-//                        'component' => 'Snowdog_CustomDescription/js/components/dynamic-rows-import-custom-description',
                         'template' => 'ui/dynamic-rows/templates/collapsible',
                         'additionalClasses' => 'admin__field-wide',
                         'deleteProperty' => static::FIELD_IS_DELETE,
@@ -365,7 +370,23 @@ class CustomDescription extends AbstractModifier
             ],
             'children' => [
                 static::FIELD_DESCRIPTION_ID => $this->getOptionIdFieldConfig(10),
-                static::FIELD_TITLE_NAME => $this->getTitleFieldConfig(20),
+                static::FIELD_TITLE_NAME => $this->getTitleFieldConfig(
+                    20,
+                    [
+                        'arguments' => [
+                            'data' => [
+                                'config' => [
+                                    'label' => __('Title'),
+                                    'component' => 'Magento_Catalog/component/static-type-input',
+                                    'valueUpdate' => 'input',
+                                    'imports' => [
+                                        'entityId' => '${ $.provider }:${ $.parentScope }.entity_id'
+                                    ]
+                                ],
+                            ],
+                        ]
+                    ]
+                ),
                 static::FIELD_DESCRIPTION_NAME => $this->getDescriptionFieldConfig(30),
                 static::FIELD_IMAGE_NAME => $this->getImageFieldConfig(40)
             ]
@@ -471,7 +492,7 @@ class CustomDescription extends AbstractModifier
                         'formElement' => 'fileUploader',
                         'componentType' => 'fileUploader',
                         'component' => 'Magento_Ui/js/form/element/file-uploader',
-                        'elementTmpl' => 'Magento_Downloadable/components/file-uploader',
+                        'elementTmpl' => 'Magento_Downloadable/components/file-uploader', // Added just for a good looking, you can use your own
                         'fileInputName' => 'image',
                         'uploaderConfig' => [
                             'url' => $this->urlBuilder->addSessionParam()->getUrl(
@@ -479,7 +500,7 @@ class CustomDescription extends AbstractModifier
                                 ['_secure' => true]
                             ),
                         ],
-                        'allowedExtensions' => 'jpg jpeg gif png svg',
+                        'allowedExtensions' => 'jpg jpeg gif png',
                         'dataScope' => 'file',
                         'validation' => [
                             'required-entry' => true,
@@ -535,5 +556,30 @@ class CustomDescription extends AbstractModifier
                 ],
             ],
         ];
+    }
+
+    /**
+     * @param $descData
+     * @return mixed
+     */
+    private function addImageData($descData) {
+        if (!empty($descData['image'])
+            && $this->helper->isExistingImage($descData['image'])
+        ) {
+            $imageUrl = $this->helper->getImageUrl($descData['image']);
+            $imageName = $this->helper->getImageNameFromPath($descData['image']);
+            $size = $this->helper->getImageSize($descData['image']);
+
+            $descData['file'][0] = [
+                'file' => $descData['image'],
+                'name' => $imageName,
+                'path' => $descData['image'],
+                'status' => 'old',
+                'url' => $imageUrl,
+                'size' => $size
+            ];
+        }
+
+        return $descData;
     }
 }
