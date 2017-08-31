@@ -192,7 +192,7 @@ class CustomDescription extends AbstractModifier
                     'arguments' => [
                         'data' => [
                             'config' => [
-                                'label' => __('Detailed Description'),
+                                'label' => __('Structured Description'),
                                 'componentType' => Fieldset::NAME,
                                 'dataScope' => static::GROUP_CUSTOM_DESCRIPTION_SCOPE,
                                 'collapsible' => true,
