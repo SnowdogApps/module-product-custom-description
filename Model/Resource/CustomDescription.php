@@ -10,10 +10,14 @@ use Magento\Framework\Model\ResourceModel\Db\Context;
  * Class CustomDescription
  *
  * @package Snowdog\CustomDescription\Model\Resource
+ *
+ * @SuppressWarnings(PHPMD.CamelCaseMethodName)
  */
 class CustomDescription extends AbstractDb
 {
-
+    /**
+     * @var CollectionFactory
+     */
     protected $collectionFactory;
 
     /**
@@ -60,5 +64,4 @@ class CustomDescription extends AbstractDb
 
         return $collection;
     }
-
 }

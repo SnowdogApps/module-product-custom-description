@@ -8,6 +8,7 @@ use Magento\Framework\Exception\NoSuchEntityException;
  * Custom Description repository interface
  *
  * @api
+ * @SuppressWarnings(PHPMD.ShortVariableName)
  */
 interface CustomDescriptionRepositoryInterface
 {

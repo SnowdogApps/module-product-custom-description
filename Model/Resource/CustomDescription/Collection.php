@@ -8,6 +8,8 @@ use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
  * Class Collection
  * 
  * @package Snowdog\CustomDescription\Model\Resource\CustomDescription
+ *
+ * @SuppressWarnings(PHPMD.CamelCaseMethodName)
  */
 class Collection extends AbstractCollection
 {

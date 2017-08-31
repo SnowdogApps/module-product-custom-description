@@ -6,8 +6,9 @@ namespace Snowdog\CustomDescription\Api\Data;
  * Custom Description interface
  *
  * @api
+ * @SuppressWarnings(PHPMD.ShortVariableName)
  */
-interface CustomDescriptionInterface extends \Magento\Framework\Api\ExtensibleDataInterface
+interface CustomDescriptionInterface
 {
     /**
      * @return int

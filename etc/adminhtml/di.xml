@@ -4,10 +4,13 @@
     <type name="Magento\Catalog\Controller\Adminhtml\Product\Save">
         <plugin name="snowcustomdescription_plugin_product_save_after"
                 type="Snowdog\CustomDescription\Plugin\Adminhtml\ProductSave"
-                sortOrder="1" />
+                sortOrder="1"
+        />
     </type>
 
-    <virtualType name="Magento\Catalog\Ui\DataProvider\Product\Form\Modifier\Pool" type="Magento\Ui\DataProvider\Modifier\Pool">
+    <virtualType name="Magento\Catalog\Ui\DataProvider\Product\Form\Modifier\Pool"
+                 type="Magento\Ui\DataProvider\Modifier\Pool"
+    >
         <arguments>
             <argument name="modifiers" xsi:type="array">
                 <item name="custom-description" xsi:type="array">

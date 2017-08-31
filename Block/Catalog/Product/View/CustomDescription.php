@@ -15,6 +15,8 @@ use Snowdog\CustomDescription\Controller\Adminhtml\File\Upload;
  * Class CustomDescription
  * 
  * @package Snowdog\CustomDescription\Block\Catalog\Product\View
+ *
+ * @SuppressWarnings(PHPMD.CamelCasePropertyName)
  */
 class CustomDescription extends AbstractView
 {
@@ -29,6 +31,7 @@ class CustomDescription extends AbstractView
      * @var StoreManagerInterface
      */
     private $storeManager;
+    
     /**
      * @var Data
      */
@@ -40,19 +43,19 @@ class CustomDescription extends AbstractView
      * @param Context $context
      * @param ArrayUtils $arrayUtils
      * @param array $data
-     * @param CustomDescriptionRepository $customDescriptionRepository
+     * @param CustomDescriptionRepository $customDescRepository
      * @param StoreManagerInterface $storeManager
      * @param Data $helper
      */
     public function __construct(
-        CustomDescriptionRepository $customDescriptionRepository,
+        CustomDescriptionRepository $customDescRepository,
         StoreManagerInterface $storeManager,
         Data $helper,
         Context $context,
         ArrayUtils $arrayUtils,
         array $data = []
     ) {
-        $this->customDescriptionRepository = $customDescriptionRepository;
+        $this->customDescriptionRepository = $customDescRepository;
 
         parent::__construct($context, $arrayUtils, $data);
         $this->storeManager = $storeManager;

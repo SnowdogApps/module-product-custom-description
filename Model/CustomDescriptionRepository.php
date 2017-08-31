@@ -6,6 +6,8 @@ use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Snowdog\CustomDescription\Api\CustomDescriptionRepositoryInterface;
 use Snowdog\CustomDescription\Api\Data;
+use Snowdog\CustomDescription\Api\Data\CustomDescriptionInterface;
+use Snowdog\CustomDescription\Model\Resource\CustomDescription\Collection;
 use Snowdog\CustomDescription\Model\Resource\CustomDescription\CollectionFactory;
 use Snowdog\CustomDescription\Model\CustomDescriptionFactory;
 use Snowdog\CustomDescription\Model\Resource\CustomDescription as CustomDescriptionResource;
@@ -15,17 +17,19 @@ use Magento\Framework\Exception\CouldNotSaveException;
  * Class CustomDescriptionRepository
  * 
  * @package Snowdog\CustomDescription\Model
+ *
+ * @SuppressWarnings(PHPMD.LongVariableName)
+ * @SuppressWarnings(PHPMD.ShortVariableName)
  */
 class CustomDescriptionRepository implements CustomDescriptionRepositoryInterface
 {
-
     /**
-     * @var \Snowdog\CustomDescription\Api\Data\CustomDescriptionInterface[]
+     * @var CustomDescriptionInterface[]
      */
     protected $entities = [];
 
     /**
-     * @var \Snowdog\CustomDescription\Api\Data\CustomDescriptionInterface[]
+     * @var CustomDescriptionInterface[]
      */
     protected $entitiesByProductId = [];
 
@@ -51,7 +55,7 @@ class CustomDescriptionRepository implements CustomDescriptionRepositoryInterfac
 
     /**
      * CustomDescriptionRepository constructor.
-     * @param \Snowdog\CustomDescription\Model\CustomDescriptionFactory $customDescriptionFactory
+     * @param CustomDescriptionFactory $customDescriptionFactory
      * @param CollectionFactory $customDescriptionCollectionFactory
      * @param CustomDescriptionResource $customDescriptionResource
      */
@@ -95,7 +99,7 @@ class CustomDescriptionRepository implements CustomDescriptionRepositoryInterfac
     public function getAll()
     {
         if (!$this->allLoaded) {
-            /** @var $customDescriptionCollection \Snowdog\CustomDescription\Model\Resource\CustomDescription\Collection */
+            /** @var $customDescriptionCollection Collection */
             $customDescriptionCollection = $this
                 ->customDescriptionCollectionFactory
                 ->create();
@@ -135,7 +139,7 @@ class CustomDescriptionRepository implements CustomDescriptionRepositoryInterfac
     /**
      * {@inheritdoc}
      */
-    public function save(\Snowdog\CustomDescription\Api\Data\CustomDescriptionInterface $customDescription)
+    public function save(CustomDescriptionInterface $customDescription)
     {
         try {
             $this->resource->save($customDescription);
@@ -149,7 +153,7 @@ class CustomDescriptionRepository implements CustomDescriptionRepositoryInterfac
     /**
      * {@inheritdoc}
      */
-    public function delete(\Snowdog\CustomDescription\Api\Data\CustomDescriptionInterface $customDescription)
+    public function delete(CustomDescriptionInterface $customDescription)
     {
         try {
             $customDescription->delete();

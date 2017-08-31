@@ -17,11 +17,14 @@ use Magento\Framework\UrlInterface;
 use Snowdog\CustomDescription\Api\CustomDescriptionRepositoryInterface;
 use Magento\Ui\Component\Container;
 use Magento\Ui\Component\DynamicRows;
+use Snowdog\CustomDescription\Api\Data\CustomDescriptionInterface;
 use Snowdog\CustomDescription\Helper\Data;
 
 /**
  * Class CustomDescription
  * @package Snowdog\CustomDescription\Ui\DataProvider\Product\Form\Modifier
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class CustomDescription extends AbstractModifier
 {
@@ -143,8 +146,8 @@ class CustomDescription extends AbstractModifier
         $productCustomDesc = $this->customDescRepo->getCustomDescriptionByProductId($productId);
         $customDescriptions = $productCustomDesc ?: [];
 
-        /** @var \Snowdog\CustomDescription\Api\Data\CustomDescriptionInterface $description */
-        foreach ($customDescriptions as $index => $description) {;
+        /** @var CustomDescriptionInterface $description */
+        foreach ($customDescriptions as $description) {
             $descData = $description->getData() ?: [];
             $descData = $this->addImageData($descData);
             $descriptions[] = $descData;
@@ -171,16 +174,16 @@ class CustomDescription extends AbstractModifier
     public function modifyMeta(array $meta)
     {
         $this->meta = $meta;
-        $this->createCustomOptionsPanel();
+        $this->createCustomDescriptionPanel();
         return $this->meta;
     }
 
     /**
-     * Create "Customizable Options" panel
+     * Create "Customizable Description" panel
      *
      * @return $this
      */
-    protected function createCustomOptionsPanel()
+    protected function createCustomDescriptionPanel()
     {
         $this->meta = array_replace_recursive(
             $this->meta,
@@ -269,7 +272,6 @@ class CustomDescription extends AbstractModifier
             'arguments' => [
                 'data' => [
                     'config' => [
-                        'addButtonLabel' => __('Add Detailed Description'),
                         'componentType' => DynamicRows::NAME,
                         'template' => 'ui/dynamic-rows/templates/collapsible',
                         'additionalClasses' => 'admin__field-wide',
@@ -280,9 +282,7 @@ class CustomDescription extends AbstractModifier
                         'columnsHeader' => false,
                         'collapsibleHeader' => true,
                         'sortOrder' => $sortOrder,
-                        'dataProvider' => static::CUSTOM_DESCRIPTION_LISTING,
-                        'imports' => ['insertData' => '${ $.provider }:${ $.dataProvider }'],
-                    ],
+                    ]
                 ],
             ],
             'children' => [
@@ -323,7 +323,7 @@ class CustomDescription extends AbstractModifier
     }
 
     /**
-     * Get config for hidden field responsible for enabling custom options processing
+     * Get config for hidden field responsible for enabling custom descriptions processing
      *
      * @param int $sortOrder
      * @return array

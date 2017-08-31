@@ -17,6 +17,8 @@ use Snowdog\CustomDescription\Helper\Data;
 /**
  * Class Upload
  * @package Snowdog\CustomDescription\Controller\File
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class Upload extends Action
 {

@@ -4,6 +4,7 @@ namespace Snowdog\CustomDescription\Plugin\Adminhtml;
 
 use Magento\Catalog\Controller\Adminhtml\Product\Save;
 use Magento\Framework\App\ObjectManager;
+use Magento\Framework\Filesystem\Driver\File;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Framework\Image\AdapterFactory;
 use Magento\MediaStorage\Model\File\UploaderFactory;
@@ -11,20 +12,23 @@ use Magento\Framework\Filesystem;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Registry;
 use Snowdog\CustomDescription\Api\CustomDescriptionRepositoryInterface;
+use Snowdog\CustomDescription\Api\Data\CustomDescriptionInterface;
+use Snowdog\CustomDescription\Helper\Data;
 use Snowdog\CustomDescription\Model\CustomDescriptionFactory;
 
 /**
  * Class ProductSave
  * 
  * @package Snowdog\CustomDescription\Plugin\Adminhtml
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class ProductSave
 {
-
     /**
      * @var ManagerInterface
      */
-    private $_messageManager;
+    private $messageManager;
 
     /**
      * @var AdapterFactory
@@ -62,6 +66,16 @@ class ProductSave
     private $customDescRepo;
 
     /**
+     * @var Data
+     */
+    private $helper;
+
+    /**
+     * @var File
+     */
+    private $file;
+
+    /**
      * ProductSave constructor.
      *
      * @param ManagerInterface $messageManager
@@ -70,8 +84,12 @@ class ProductSave
      * @param Filesystem $filesystem
      * @param RequestInterface $request
      * @param Registry $registry
-     * @param CustomDescriptionFactory $customDescriptionFactory
+     * @param CustomDescriptionFactory $customDescFactory
      * @param CustomDescriptionRepositoryInterface $customDescRepo
+     * @param Data $helper
+     * @param File $file
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
         ManagerInterface $messageManager,
@@ -80,17 +98,21 @@ class ProductSave
         Filesystem $filesystem,
         RequestInterface $request,
         Registry $registry,
-        CustomDescriptionFactory $customDescriptionFactory,
-        CustomDescriptionRepositoryInterface $customDescRepo
+        CustomDescriptionFactory $customDescFactory,
+        CustomDescriptionRepositoryInterface $customDescRepo,
+        Data $helper,
+        File $file
     ) {
-        $this->_messageManager = $messageManager;
+        $this->messageManager = $messageManager;
         $this->adapterFactory = $adapterFactory;
         $this->uploader = $uploader;
         $this->filesystem = $filesystem;
         $this->request = $request;
         $this->registry = $registry;
-        $this->customDescriptionFactory = $customDescriptionFactory;
+        $this->customDescriptionFactory = $customDescFactory;
         $this->customDescRepo = $customDescRepo;
+        $this->helper = $helper;
+        $this->file = $file;
     }
 
     /**
@@ -99,6 +121,8 @@ class ProductSave
      * @return mixed
      *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function afterExecute(Save $subject, $result)
     {
@@ -116,7 +140,13 @@ class ProductSave
                             $item = $this->customDescRepo->get($detDesc['entity_id']);
 
                             if (isset($detDesc['is_delete']) && $detDesc['is_delete']) {
-                                $item->delete();
+                                try {
+                                    $this->removeImageFromItem($item);
+                                    $this->customDescRepo->delete($item);
+                                } catch (\Exception $e) {
+                                    $this->messageManager
+                                        ->addErrorMessage(__("Couldn't remove item correctly " . $e->getMessage()));
+                                }
                                 continue;
                             }
                         } else {
@@ -141,11 +171,11 @@ class ProductSave
                             try {
                                 $this->customDescRepo->save($item);
                             } catch (\Exception $e) {
-                                $this->_messageManager
+                                $this->messageManager
                                     ->addErrorMessage(__("Couldn't save changes on custom description " . $e->getMessage()));
                             }
                         } else {
-                            $this->_messageManager
+                            $this->messageManager
                                 ->addErrorMessage(__("Couldn't save description {$detDesc['description_id']}. Image upload failed."));
                         }
                     }
@@ -154,6 +184,18 @@ class ProductSave
         }
 
         return $result;
+    }
+
+    /**
+     * @param CustomDescriptionInterface $item
+     * @throws \Magento\Framework\Exception\FileSystemException
+     */
+    private function removeImageFromItem(CustomDescriptionInterface $item)
+    {
+        if ($this->helper->isExistingImage($item->getImage())) {
+            $fullPath = $this->helper->getImageFullPath($item->getImage());
+            $this->file->deleteFile($fullPath);
+        }
     }
 
     /**

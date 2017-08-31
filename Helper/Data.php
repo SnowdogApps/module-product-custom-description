@@ -88,4 +88,15 @@ class Data extends AbstractHelper
     {
         return $this->mediaDirectory->isFile(self::IMAGES_UPLOAD . $image);
     }
+
+    /**
+     * @param $image
+     * @return string
+     */
+    public function getImageFullPath($image)
+    {
+        return $this->mediaDirectory->getAbsolutePath()
+            . self::IMAGES_UPLOAD
+            . $image;
+    }
 }

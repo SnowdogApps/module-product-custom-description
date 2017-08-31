@@ -20,6 +20,8 @@ class InstallSchema implements InstallSchemaInterface
      * @param SchemaSetupInterface $setup
      * @param ModuleContextInterface $context
      * @return void
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function install(SchemaSetupInterface $setup, ModuleContextInterface $context)
     {
@@ -76,5 +78,4 @@ class InstallSchema implements InstallSchemaInterface
 
         $installer->endSetup();
     }
-
 }

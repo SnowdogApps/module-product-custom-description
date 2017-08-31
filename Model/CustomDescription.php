@@ -9,10 +9,11 @@ use Snowdog\CustomDescription\Api\Data\CustomDescriptionInterface;
  * Class CustomDescription
  * 
  * @package Snowdog\CustomDescription\Model
+ *
+ * @SuppressWarnings(PHPMD.CamelCaseMethodName)
  */
 class CustomDescription extends AbstractModel implements CustomDescriptionInterface
 {
-
     /**
      * Define resource model
      */
@@ -22,7 +23,7 @@ class CustomDescription extends AbstractModel implements CustomDescriptionInterf
     }
 
     /**
-     * Get custom description list form a given product id
+     * Get custom description list from a given product id
      *
      * @param $productId
      *
