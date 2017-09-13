@@ -2,8 +2,6 @@
 
 namespace Snowdog\CustomDescription\Api;
 
-use Magento\Framework\Exception\NoSuchEntityException;
-
 /**
  * Custom Description repository interface
  *
@@ -17,7 +15,7 @@ interface CustomDescriptionRepositoryInterface
      *
      * @param int $id
      * @return \Snowdog\CustomDescription\Api\Data\CustomDescriptionInterface
-     * @throws NoSuchEntityException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function get($id);
 
@@ -47,7 +45,7 @@ interface CustomDescriptionRepositoryInterface
 
     /**
      * @param Data\CustomDescriptionInterface $customDescription
-     * @return mixed
+     * @throws \Magento\Framework\Exception\CouldNotDeleteException
      */
     public function delete(\Snowdog\CustomDescription\Api\Data\CustomDescriptionInterface $customDescription);
 }

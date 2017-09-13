@@ -19,7 +19,7 @@ class CustomDescription extends AbstractModel implements CustomDescriptionInterf
      */
     protected function _construct()
     {
-        $this->_init('Snowdog\CustomDescription\Model\Resource\CustomDescription');
+        $this->_init(\Snowdog\CustomDescription\Model\Resource\CustomDescription::class);
     }
 
     /**
@@ -43,7 +43,7 @@ class CustomDescription extends AbstractModel implements CustomDescriptionInterf
      */
     public function getProductId()
     {
-        return $this->_getData('product_id');
+        return $this->_getData(self::PRODUCT_ID);
     }
 
     /**
@@ -51,7 +51,7 @@ class CustomDescription extends AbstractModel implements CustomDescriptionInterf
      */
     public function setProductId($productId)
     {
-        return $this->setData('product_id', $productId);
+        return $this->setData(self::PRODUCT_ID, $productId);
     }
 
     /**
@@ -59,7 +59,7 @@ class CustomDescription extends AbstractModel implements CustomDescriptionInterf
      */
     public function getTitle()
     {
-        return $this->_getData('title');
+        return $this->_getData(self::TITLE);
     }
 
     /**
@@ -67,7 +67,7 @@ class CustomDescription extends AbstractModel implements CustomDescriptionInterf
      */
     public function setTitle($title)
     {
-        return $this->setData('title', $title);
+        return $this->setData(self::TITLE, $title);
     }
 
     /**
@@ -75,7 +75,7 @@ class CustomDescription extends AbstractModel implements CustomDescriptionInterf
      */
     public function getDescription()
     {
-        return $this->_getData('description');
+        return $this->_getData(self::DESCRIPTION);
     }
 
     /**
@@ -83,7 +83,7 @@ class CustomDescription extends AbstractModel implements CustomDescriptionInterf
      */
     public function setDescription($description)
     {
-        return $this->setData('description', $description);
+        return $this->setData(self::DESCRIPTION, $description);
     }
 
     /**
@@ -91,7 +91,7 @@ class CustomDescription extends AbstractModel implements CustomDescriptionInterf
      */
     public function getImage()
     {
-        return $this->_getData('image');
+        return $this->_getData(self::IMAGE);
     }
 
     /**
@@ -99,7 +99,7 @@ class CustomDescription extends AbstractModel implements CustomDescriptionInterf
      */
     public function setImage($image)
     {
-        return $this->setData('image', $image);
+        return $this->setData(self::IMAGE, $image);
     }
 
     /**
@@ -107,7 +107,7 @@ class CustomDescription extends AbstractModel implements CustomDescriptionInterf
      */
     public function getPosition()
     {
-        return $this->_getData('position');
+        return $this->_getData(self::POSITION);
     }
 
     /**
@@ -115,6 +115,6 @@ class CustomDescription extends AbstractModel implements CustomDescriptionInterf
      */
     public function setPosition($position)
     {
-        return $this->setData('position', $position);
+        return $this->setData(self::POSITION, $position);
     }
 }

@@ -10,6 +10,12 @@ namespace Snowdog\CustomDescription\Api\Data;
  */
 interface CustomDescriptionInterface
 {
+    const PRODUCT_ID    = 'product_id';
+    const TITLE         = 'title';
+    const DESCRIPTION   = 'description';
+    const IMAGE         = 'image';
+    const POSITION      = 'position';
+
     /**
      * @return int
      */

@@ -19,8 +19,8 @@ class Collection extends AbstractCollection
     protected function _construct()
     {
         $this->_init(
-            'Snowdog\CustomDescription\Model\CustomDescription',
-            'Snowdog\CustomDescription\Model\Resource\CustomDescription'
+            \Snowdog\CustomDescription\Model\CustomDescription::class,
+            \Snowdog\CustomDescription\Model\Resource\CustomDescription::class
         );
     }
 }
