@@ -5,11 +5,9 @@ namespace Snowdog\CustomDescription\Block\Catalog\Product\View;
 use Magento\Catalog\Block\Product\View\AbstractView;
 use Magento\Catalog\Block\Product\Context;
 use Magento\Framework\Stdlib\ArrayUtils;
-use Magento\Framework\UrlInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Snowdog\CustomDescription\Helper\Data;
 use Snowdog\CustomDescription\Model\CustomDescriptionRepository;
-use Snowdog\CustomDescription\Controller\Adminhtml\File\Upload;
 
 /**
  * Class CustomDescription
@@ -40,12 +38,12 @@ class CustomDescription extends AbstractView
     /**
      * CustomDescription constructor.
      *
-     * @param Context $context
-     * @param ArrayUtils $arrayUtils
-     * @param array $data
      * @param CustomDescriptionRepository $customDescRepository
      * @param StoreManagerInterface $storeManager
      * @param Data $helper
+     * @param Context $context
+     * @param ArrayUtils $arrayUtils
+     * @param array $data
      */
     public function __construct(
         CustomDescriptionRepository $customDescRepository,

@@ -1,0 +1,19 @@
+.static_review_template: &static_review_definition
+    before_script:
+        - rm -f composer.json
+        - composer init --no-ansi --no-interaction
+        - composer config repositories.snowdog composer https://repo.snowdog.pro --no-ansi --no-interaction
+        - composer require snowdog/php-static-review --no-ansi --no-interaction --no-progress --prefer-dist
+        - export PACKAGE_DIR='vendor/snowdog/php-static-review'
+static_review:feature:
+    <<: *static_review_definition
+    script:
+        - vendor/bin/ci.sh develop "$CI_BUILD_REF_NAME" "$PACKAGE_DIR/resources/magento2/phpcs.xml" "$PACKAGE_DIR/resources/magento2/phpmd.xml"
+    only:
+        - /^feature/.*$/
+static_review:develop:
+    <<: *static_review_definition
+    script:
+        - vendor/bin/ci.sh master "$CI_BUILD_REF_NAME" "$PACKAGE_DIR/resources/magento2/phpcs.xml" "$PACKAGE_DIR/resources/magento2/phpmd.xml"
+    only:
+        - develop
