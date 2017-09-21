@@ -5,7 +5,6 @@ namespace Snowdog\CustomDescription\Model;
 use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Snowdog\CustomDescription\Api\CustomDescriptionRepositoryInterface;
-use Snowdog\CustomDescription\Api\Data;
 use Snowdog\CustomDescription\Api\Data\CustomDescriptionInterface;
 use Snowdog\CustomDescription\Model\Resource\CustomDescription\Collection;
 use Snowdog\CustomDescription\Model\Resource\CustomDescription\CollectionFactory;
@@ -15,9 +14,7 @@ use Magento\Framework\Exception\CouldNotSaveException;
 
 /**
  * Class CustomDescriptionRepository
- * 
  * @package Snowdog\CustomDescription\Model
- *
  * @SuppressWarnings(PHPMD.LongVariableName)
  * @SuppressWarnings(PHPMD.ShortVariableName)
  */
@@ -39,7 +36,7 @@ class CustomDescriptionRepository implements CustomDescriptionRepositoryInterfac
     protected $allLoaded = false;
 
     /**
-     * @var \Snowdog\CustomDescription\Model\CustomDescriptionFactory
+     * @var CustomDescriptionFactory
      */
     protected $customDescriptionFactory;
 

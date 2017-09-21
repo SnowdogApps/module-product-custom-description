@@ -63,7 +63,7 @@ class Data extends AbstractHelper
 
     /**
      * @param $imagePath
-     * @return mixed
+     * @return string
      */
     public function getImageNameFromPath($imagePath)
     {

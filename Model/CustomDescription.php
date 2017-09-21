@@ -7,9 +7,7 @@ use Snowdog\CustomDescription\Api\Data\CustomDescriptionInterface;
 
 /**
  * Class CustomDescription
- * 
  * @package Snowdog\CustomDescription\Model
- *
  * @SuppressWarnings(PHPMD.CamelCaseMethodName)
  */
 class CustomDescription extends AbstractModel implements CustomDescriptionInterface
@@ -24,12 +22,8 @@ class CustomDescription extends AbstractModel implements CustomDescriptionInterf
 
     /**
      * Get custom description list from a given product id
-     *
      * @param $productId
-     *
      * @return array
-     *
-     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getCustomDescriptionByProductId($productId)
     {

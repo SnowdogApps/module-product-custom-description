@@ -9,7 +9,6 @@ use Magento\Framework\DB\Ddl\Table;
 
 /**
  * Class InstallSchema
- * 
  * @package Snowdog\CustomDescription\Setup
  */
 class InstallSchema implements InstallSchemaInterface

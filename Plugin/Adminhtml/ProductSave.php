@@ -18,9 +18,7 @@ use Snowdog\CustomDescription\Model\CustomDescriptionFactory;
 
 /**
  * Class ProductSave
- * 
  * @package Snowdog\CustomDescription\Plugin\Adminhtml
- *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class ProductSave
@@ -126,60 +124,73 @@ class ProductSave
      */
     public function afterExecute(Save $subject, $result)
     {
-        $params = $this->request->getParams();
         $product = $this->registry->registry('current_product');
 
-        if ($product) {
-            $productId = $product->getId();
-            $customDescData = isset($params['product']['descriptions']) ? $params['product']['descriptions'] : false;
+        if (empty($product)) {
+            return $result;
+        }
 
-            if (is_array($customDescData) && !empty($productId)) {
-                foreach ($customDescData as $detDesc) {
-                    if ($this->validateCustomDescData($detDesc)) {
-                        if (isset($detDesc['entity_id']) && $detDesc['entity_id']) {
-                            $item = $this->customDescRepo->get($detDesc['entity_id']);
+        $params = $this->request->getParams();
+        $customDescData = isset($params['product']['descriptions'])
+            ? $params['product']['descriptions']
+            : false;
 
-                            if (isset($detDesc['is_delete']) && $detDesc['is_delete']) {
-                                try {
-                                    $this->removeImageFromItem($item);
-                                    $this->customDescRepo->delete($item);
-                                } catch (\Exception $e) {
-                                    $this->messageManager
-                                        ->addErrorMessage(__("Couldn't remove item correctly " . $e->getMessage()));
-                                }
-                                continue;
-                            }
-                        } else {
-                            /* @var $customDescription \Snowdog\CustomDescription\Model\CustomDescription */
-                            $customDescription = $this->customDescriptionFactory->create();
-                            $item = $customDescription;
-                        }
+        if (!is_array($customDescData)) {
+            return $result;
+        }
 
-                        $file = isset($detDesc['file'][0]['file']) ? $detDesc['file'][0]['file'] : false;
+        $productId = $product->getId();
 
-                        if (isset($detDesc['file']) || $item->getId()) {
-                            $sortOrder = isset($detDesc['position']) ? $detDesc['position'] : 0;
-                            $item->setData('description', $detDesc['description']);
-                            $item->setData('title', $detDesc['title']);
-                            $item->setData('product_id', $productId);
-                            $item->setData('position', $sortOrder);
+        foreach ($customDescData as $detDesc) {
+            if (!$this->validateCustomDescData($detDesc)) {
+                continue;
+            }
 
-                            if ($file) {
-                                $item->setData('image', $file);
-                            }
+            if (!empty($detDesc['entity_id'])) {
+                $item = $this->customDescRepo->get($detDesc['entity_id']);
 
-                            try {
-                                $this->customDescRepo->save($item);
-                            } catch (\Exception $e) {
-                                $this->messageManager
-                                    ->addErrorMessage(__("Couldn't save changes on custom description " . $e->getMessage()));
-                            }
-                        } else {
-                            $this->messageManager
-                                ->addErrorMessage(__("Couldn't save description {$detDesc['description_id']}. Image upload failed."));
-                        }
+                if (isset($detDesc['is_delete']) && $detDesc['is_delete']) {
+                    try {
+                        $this->removeImageFromItem($item);
+                        $this->customDescRepo->delete($item);
+                    } catch (\Exception $e) {
+                        $this->messageManager
+                            ->addErrorMessage(__("Couldn't remove item correctly " . $e->getMessage()));
                     }
+                    continue;
                 }
+            } else {
+                /* @var $customDescription \Snowdog\CustomDescription\Model\CustomDescription */
+                $customDescription = $this->customDescriptionFactory->create();
+                $item = $customDescription;
+            }
+
+            $file = isset($detDesc['file'][0]['file']) ? $detDesc['file'][0]['file'] : false;
+
+            if (isset($detDesc['file']) || $item->getId()) {
+                $sortOrder = isset($detDesc['position']) ? $detDesc['position'] : 0;
+                $item->setData('description', $detDesc['description']);
+                $item->setData('title', $detDesc['title']);
+                $item->setData('product_id', $productId);
+                $item->setData('position', $sortOrder);
+
+                if ($file) {
+                    $item->setData('image', $file);
+                }
+
+                try {
+                    $this->customDescRepo->save($item);
+                } catch (\Exception $e) {
+                    $this->messageManager
+                        ->addErrorMessage(
+                            __("Couldn't save changes on custom description " . $e->getMessage())
+                        );
+                }
+            } else {
+                $this->messageManager
+                    ->addErrorMessage(
+                        __("Couldn't save description {$detDesc['description_id']}. Image upload failed.")
+                    );
             }
         }
 

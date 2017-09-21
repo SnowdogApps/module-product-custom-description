@@ -32,8 +32,8 @@ class CustomDescription extends AbstractDb
      * CustomDescription constructor.
      *
      * @param Context $context
-     * @param null|string $connectionName
      * @param $collectionFactory $categoryCollectionFactory
+     * @param null|string $connectionName
      */
     public function __construct(
         Context $context,
@@ -49,10 +49,7 @@ class CustomDescription extends AbstractDb
      * Get custom description list form a given product id
      *
      * @param $productId
-     *
      * @return \Snowdog\CustomDescription\Model\Resource\CustomDescription\Collection
-     *
-     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getCustomDescriptionByProductId($productId)
     {

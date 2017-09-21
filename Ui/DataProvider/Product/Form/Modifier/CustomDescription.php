@@ -492,7 +492,9 @@ class CustomDescription extends AbstractModifier
                         'formElement' => 'fileUploader',
                         'componentType' => 'fileUploader',
                         'component' => 'Magento_Ui/js/form/element/file-uploader',
-                        'elementTmpl' => 'Magento_Downloadable/components/file-uploader', // Added just for a good looking, you can use your own
+                        // About elementTmpl:
+                        // Added just for a good looking, you can use your own template
+                        'elementTmpl' => 'Magento_Downloadable/components/file-uploader',
                         'fileInputName' => 'image',
                         'uploaderConfig' => [
                             'url' => $this->urlBuilder->addSessionParam()->getUrl(
@@ -562,7 +564,8 @@ class CustomDescription extends AbstractModifier
      * @param $descData
      * @return mixed
      */
-    private function addImageData($descData) {
+    private function addImageData($descData)
+    {
         if (!empty($descData['image'])
             && $this->helper->isExistingImage($descData['image'])
         ) {

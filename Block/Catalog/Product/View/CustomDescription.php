@@ -11,9 +11,7 @@ use Snowdog\CustomDescription\Model\CustomDescriptionRepository;
 
 /**
  * Class CustomDescription
- * 
  * @package Snowdog\CustomDescription\Block\Catalog\Product\View
- *
  * @SuppressWarnings(PHPMD.CamelCasePropertyName)
  */
 class CustomDescription extends AbstractView
