@@ -2,29 +2,31 @@
 
 namespace Snowdog\CustomDescription\Plugin\Adminhtml;
 
+use Magento\Catalog\Controller\Adminhtml\Product\Save;
+use Magento\Framework\Filesystem\Driver\File;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Framework\Image\AdapterFactory;
 use Magento\MediaStorage\Model\File\UploaderFactory;
 use Magento\Framework\Filesystem;
-use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Registry;
-use Magento\Catalog\Controller\Adminhtml\Product\Save\Interceptor;
-use Magento\Backend\Model\View\Result\Redirect\Interceptor as RedirectInterceptor;
+use Snowdog\CustomDescription\Api\CustomDescriptionRepositoryInterface;
+use Snowdog\CustomDescription\Api\Data\CustomDescriptionInterface;
+use Snowdog\CustomDescription\Helper\Data;
 use Snowdog\CustomDescription\Model\CustomDescriptionFactory;
+use Snowdog\CustomDescription\Model\Resource\CustomDescriptionBatchProcessor;
 
 /**
  * Class ProductSave
- * 
  * @package Snowdog\CustomDescription\Plugin\Adminhtml
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class ProductSave
 {
-
     /**
      * @var ManagerInterface
      */
-    private $_messageManager;
+    private $messageManager;
 
     /**
      * @var AdapterFactory
@@ -57,97 +59,119 @@ class ProductSave
     private $customDescriptionFactory;
 
     /**
+     * @var CustomDescriptionRepositoryInterface
+     */
+    private $customDescRepo;
+
+    /**
+     * @var Data
+     */
+    private $helper;
+
+    /**
+     * @var File
+     */
+    private $file;
+
+    /**
+     * @var CustomDescriptionBatchProcessor
+     */
+    private $descriptionBatchProcessor;
+
+    /**
      * ProductSave constructor.
      *
+     * @param CustomDescriptionBatchProcessor $descBatchProcessor
      * @param ManagerInterface $messageManager
      * @param AdapterFactory $adapterFactory
      * @param UploaderFactory $uploader
      * @param Filesystem $filesystem
      * @param RequestInterface $request
      * @param Registry $registry
-     * @param CustomDescriptionFactory $customDescriptionFactory
+     * @param CustomDescriptionFactory $customDescFactory
+     * @param CustomDescriptionRepositoryInterface $customDescRepo
+     * @param Data $helper
+     * @param File $file
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
+        CustomDescriptionBatchProcessor $descBatchProcessor,
         ManagerInterface $messageManager,
         AdapterFactory $adapterFactory,
         UploaderFactory $uploader,
         Filesystem $filesystem,
         RequestInterface $request,
         Registry $registry,
-        CustomDescriptionFactory $customDescriptionFactory
+        CustomDescriptionFactory $customDescFactory,
+        CustomDescriptionRepositoryInterface $customDescRepo,
+        Data $helper,
+        File $file
     ) {
-        $this->_messageManager = $messageManager;
+        $this->messageManager = $messageManager;
         $this->adapterFactory = $adapterFactory;
         $this->uploader = $uploader;
         $this->filesystem = $filesystem;
         $this->request = $request;
         $this->registry = $registry;
-        $this->customDescriptionFactory = $customDescriptionFactory;
+        $this->customDescriptionFactory = $customDescFactory;
+        $this->customDescRepo = $customDescRepo;
+        $this->helper = $helper;
+        $this->file = $file;
+        $this->descriptionBatchProcessor = $descBatchProcessor;
     }
 
     /**
-     * Save custom description by plugin method
+     * @param Save $subject
+     * @param $result
+     * @return mixed
      *
-     * @param Interceptor $subject
-     * @param RedirectInterceptor $result
-     *
-     * @return RedirectInterceptor
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function afterExecute(Interceptor $subject, RedirectInterceptor $result)
+    public function afterExecute(Save $subject, $result)
     {
-        $params = $this->request->getParams();
         $product = $this->registry->registry('current_product');
+        $params = $this->request->getParams();
+        $customDescData = isset($params['product']['descriptions'])
+            ? $params['product']['descriptions']
+            : false;
 
-        if ($product) {
-            $productId = $product->getId();
-            $customDescData = $params['product']['custom_description'];
-
-            if (is_array($customDescData) && !empty($productId)) {
-                /* @var $customDescription \Snowdog\CustomDescription\Model\CustomDescription */
-                $customDescription = $this->customDescriptionFactory->create();
-
-                foreach ($customDescData as $detDesc) {
-                    if ($this->validateCustomDescData($detDesc)) {
-                        if (isset($detDesc['description_id']) && $detDesc['description_id']) {
-                            $item = $customDescription->load($detDesc['description_id']);
-
-                            if (isset($detDesc['is_delete']) && $detDesc['is_delete']) {
-                                $item->delete();
-                                $item->unsetData();
-                                continue;
-                            }
-                        } else {
-                            $item = $customDescription;
-                        }
-
-                        $file = $this->uploadImage($detDesc['id'], $productId);
-
-                        if ($file || $item->getId()) {
-                            $sortOrder = isset($detDesc['sort_order']) ? $detDesc['sort_order'] : 0;
-                            $item->setData('description', $detDesc['description']);
-                            $item->setData('title', $detDesc['title']);
-                            $item->setData('product_id', $productId);
-                            $item->setData('position', $sortOrder);
-
-                            if ($file) {
-                                $item->setData('image', $file);
-                            }
-
-                            try {
-                                $item->save();
-                                $item->unsetData();
-                            } catch (\Exception $e) {
-                                $this->_messageManager->addError(__("Couldn't save changes on custom description"));
-                            }
-                        } else {
-                            $this->_messageManager->addError(__("Couldn't save description {$detDesc['description_id']}. Image upload failed."));
-                        }
-                    }
-                }
-            }
+        if (empty($product) || !is_array($customDescData)) {
+            return $result;
         }
 
+        $productId = $product->getId();
+
+        foreach ($customDescData as $detDesc) {
+            if (!$this->validateCustomDescData($detDesc)) {
+                continue;
+            }
+
+            $item = $this->initItem($detDesc);
+
+            if ($this->removeOrExcludeInvalidItem($item, $detDesc)) {
+                continue;
+            }
+
+            $item = $this->setItemData($item, $detDesc, $productId);
+            $this->descriptionBatchProcessor->persist($item);
+        }
+
+        $this->descriptionBatchProcessor->flush();
+
         return $result;
+    }
+
+    /**
+     * @param CustomDescriptionInterface $item
+     * @throws \Magento\Framework\Exception\FileSystemException
+     */
+    private function removeImageFromItem(CustomDescriptionInterface $item)
+    {
+        if ($this->helper->isExistingImage($item->getImage())) {
+            $fullPath = $this->helper->getImageFullPath($item->getImage());
+            $this->file->deleteFile($fullPath);
+        }
     }
 
     /**
@@ -160,55 +184,80 @@ class ProductSave
     private function validateCustomDescData($customDescData)
     {
         return $customDescData
-        && isset($customDescData['description'])
-        && !empty($customDescData['description'])
-        && isset($customDescData['title'])
-        && !empty($customDescData['title']);
-
+            && !empty($customDescData['description'])
+            && !empty($customDescData['title']);
     }
 
     /**
-     * Upload an image for a custom description
-     *
-     * @param $descriptionId
-     * @param $productId
-     *
-     * @return bool|string
+     * @param $item
+     * @return \Exception
      */
-    private function uploadImage($descriptionId, $productId)
+    private function removeItem($item)
     {
-        if (isset($_FILES["product_custom_description_{$descriptionId}_image"])
-            && isset($_FILES["product_custom_description_{$descriptionId}_image"]['name'])
-            && strlen($_FILES["product_custom_description_{$descriptionId}_image"]['name'])
-        ) {
-            
-            try {
-                $base_media_path = 'snowdog/customdescription/images/' . $productId . "/" . $descriptionId;
-                $uploader = $this->uploader->create(
-                    ['fileId' => "product_custom_description_{$descriptionId}_image"]
+        try {
+            $this->removeImageFromItem($item);
+            $this->customDescRepo->delete($item);
+        } catch (\Exception $e) {
+            $this->messageManager
+                ->addErrorMessage(__("Couldn't remove item correctly " . $e->getMessage()));
+        }
+    }
+
+    /**
+     * @param $item
+     * @param $detDesc
+     * @param $productId
+     * @return \Snowdog\CustomDescription\Api\Data\CustomDescriptionInterface
+     */
+    private function setItemData(CustomDescriptionInterface $item, $detDesc, $productId)
+    {
+        $sortOrder = isset($detDesc['position']) ? $detDesc['position'] : 0;
+        $file = isset($detDesc['file'][0]['file']) ? $detDesc['file'][0]['file'] : false;
+        $item->setData(CustomDescriptionInterface::DESCRIPTION, $detDesc['description']);
+        $item->setData(CustomDescriptionInterface::TITLE, $detDesc['title']);
+        $item->setData(CustomDescriptionInterface::PRODUCT_ID, $productId);
+        $item->setData(CustomDescriptionInterface::POSITION, $sortOrder);
+
+        if ($file) {
+            $item->setData(CustomDescriptionInterface::IMAGE, $file);
+        }
+
+        return $item;
+    }
+
+    /**
+     * @param $detDesc
+     * @return CustomDescriptionInterface
+     */
+    private function initItem($detDesc)
+    {
+        if (empty($detDesc['entity_id'])) {
+            return $this->customDescriptionFactory->create();
+        }
+
+        return $this->customDescRepo->get($detDesc['entity_id']);
+    }
+
+    /**
+     * @param CustomDescriptionInterface $item
+     * @param $detDesc
+     * @return bool
+     */
+    private function removeOrExcludeInvalidItem(CustomDescriptionInterface $item, $detDesc)
+    {
+        if (!empty($item->getId()) && !empty($detDesc['is_delete'])) {
+            $this->removeItem($item);
+            return true;
+        }
+
+        if (empty($detDesc['file']) && empty($item->getId())) {
+            $this->messageManager
+                ->addErrorMessage(
+                    __("Couldn't save description {$detDesc['description_id']}. Image upload failed.")
                 );
-
-                $uploader->setAllowedExtensions(['jpg', 'jpeg', 'gif', 'png']);
-                $imageAdapter = $this->adapterFactory->create();
-                $uploader->addValidateCallback('product', $imageAdapter, 'validateUploadFile');
-                $uploader->setAllowRenameFiles(true);
-                $uploader->setFilesDispersion(true);
-                $mediaDirectory = $this->filesystem->getDirectoryRead(DirectoryList::MEDIA);
-                $result = $uploader->save(
-                    $mediaDirectory->getAbsolutePath($base_media_path)
-                );
-
-                return $base_media_path . $result['file'];
-            } catch (\Exception $e) {
-                if ($e->getCode() == 0) {
-                    $this->_messageManager->addError($e->getMessage());
-                }
-
-                return false;
-            }
+            return true;
         }
 
         return false;
     }
-
 }
