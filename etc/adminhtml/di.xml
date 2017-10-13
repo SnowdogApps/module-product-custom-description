@@ -1,9 +1,29 @@
 <?xml version="1.0"?>
 
-<config>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <type name="Magento\Catalog\Controller\Adminhtml\Product\Save">
         <plugin name="snowcustomdescription_plugin_product_save_after"
                 type="Snowdog\CustomDescription\Plugin\Adminhtml\ProductSave"
-                sortOrder="1" />
+                sortOrder="1"
+        />
+    </type>
+
+    <virtualType name="Magento\Catalog\Ui\DataProvider\Product\Form\Modifier\Pool"
+                 type="Magento\Ui\DataProvider\Modifier\Pool"
+    >
+        <arguments>
+            <argument name="modifiers" xsi:type="array">
+                <item name="custom-description" xsi:type="array">
+                    <item name="class" xsi:type="string">Snowdog\CustomDescription\Ui\DataProvider\Product\Form\Modifier\CustomDescription</item>
+                    <item name="sortOrder" xsi:type="number">130</item>
+                </item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Snowdog\CustomDescription\Ui\DataProvider\Product\Form\Modifier\CustomDescription">
+        <arguments>
+            <argument name="scopeName" xsi:type="string">product_form.product_form</argument>
+        </arguments>
     </type>
 </config>

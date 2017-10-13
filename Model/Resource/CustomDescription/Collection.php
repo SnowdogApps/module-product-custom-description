@@ -6,8 +6,8 @@ use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
 
 /**
  * Class Collection
- * 
  * @package Snowdog\CustomDescription\Model\Resource\CustomDescription
+ * @SuppressWarnings(PHPMD.CamelCaseMethodName)
  */
 class Collection extends AbstractCollection
 {
@@ -17,8 +17,8 @@ class Collection extends AbstractCollection
     protected function _construct()
     {
         $this->_init(
-            'Snowdog\CustomDescription\Model\CustomDescription',
-            'Snowdog\CustomDescription\Model\Resource\CustomDescription'
+            \Snowdog\CustomDescription\Model\CustomDescription::class,
+            \Snowdog\CustomDescription\Model\Resource\CustomDescription::class
         );
     }
 }
