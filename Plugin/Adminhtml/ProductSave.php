@@ -213,13 +213,13 @@ class ProductSave
     {
         $sortOrder = isset($detDesc['position']) ? $detDesc['position'] : 0;
         $file = isset($detDesc['file'][0]['file']) ? $detDesc['file'][0]['file'] : false;
-        $item->setData('description', $detDesc['description']);
-        $item->setData('title', $detDesc['title']);
-        $item->setData('product_id', $productId);
-        $item->setData('position', $sortOrder);
+        $item->setData(CustomDescriptionInterface::DESCRIPTION, $detDesc['description']);
+        $item->setData(CustomDescriptionInterface::TITLE, $detDesc['title']);
+        $item->setData(CustomDescriptionInterface::PRODUCT_ID, $productId);
+        $item->setData(CustomDescriptionInterface::POSITION, $sortOrder);
 
         if ($file) {
-            $item->setData('image', $file);
+            $item->setData(CustomDescriptionInterface::IMAGE, $file);
         }
 
         return $item;
