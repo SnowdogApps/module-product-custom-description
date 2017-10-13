@@ -25,9 +25,22 @@ class InstallSchema implements InstallSchemaInterface
     public function install(SchemaSetupInterface $setup, ModuleContextInterface $context)
     {
         $installer = $setup;
-
         $installer->startSetup();
+        $this->createSnowdogCustomDescriptionTable($installer);
+        $installer->endSetup();
+    }
 
+    /**
+     * @param SchemaSetupInterface $installer
+     */
+    private function createSnowdogCustomDescriptionTable(SchemaSetupInterface $installer)
+    {
+        $fkName = $installer->getFkName(
+            'snowdog_custom_description',
+            'product_id',
+            'catalog_product_entity',
+            'entity_id'
+        );
         $table = $installer->getConnection()
             ->newTable($installer->getTable('snowdog_custom_description'))
             ->addColumn(
@@ -41,7 +54,7 @@ class InstallSchema implements InstallSchemaInterface
                 'product_id',
                 Table::TYPE_INTEGER,
                 10,
-                ['nullable' => false],
+                ['nullable' => false, 'unsigned' => true],
                 'Product Id'
             )
             ->addColumn(
@@ -71,10 +84,15 @@ class InstallSchema implements InstallSchemaInterface
                 ['nullable' => false, 'default' => '0'],
                 'Position'
             )
+            ->addForeignKey(
+                $fkName,
+                'product_id',
+                $installer->getTable('catalog_product_entity'),
+                'entity_id',
+                Table::ACTION_CASCADE
+            )
             ->setComment('Product Custom Description');
 
         $installer->getConnection()->createTable($table);
-
-        $installer->endSetup();
     }
 }
