@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Snowdog\CustomDescription\Plugin\Adminhtml;
 
+use Magento\Backend\Model\View\Result\Redirect;
 use Magento\Catalog\Controller\Adminhtml\Product\Save;
 use Magento\Framework\Filesystem\Driver\File;
 use Magento\Framework\Message\ManagerInterface;
@@ -10,11 +13,13 @@ use Magento\MediaStorage\Model\File\UploaderFactory;
 use Magento\Framework\Filesystem;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Registry;
+use Magento\Framework\App\ProductMetadataInterface;
 use Snowdog\CustomDescription\Api\CustomDescriptionRepositoryInterface;
 use Snowdog\CustomDescription\Api\Data\CustomDescriptionInterface;
 use Snowdog\CustomDescription\Helper\Data;
 use Snowdog\CustomDescription\Model\CustomDescriptionFactory;
 use Snowdog\CustomDescription\Model\Resource\CustomDescriptionBatchProcessor;
+use Snowdog\CustomDescription\Model\Resource\CustomDescription\Collection as CustomDescriptionCollection;
 
 /**
  * Class ProductSave
@@ -54,6 +59,11 @@ class ProductSave
     private $registry;
 
     /**
+     * @var ProductMetadataInterface
+     */
+    private $productMetadata;
+
+    /**
      * @var CustomDescriptionFactory
      */
     private $customDescriptionFactory;
@@ -79,20 +89,6 @@ class ProductSave
     private $descriptionBatchProcessor;
 
     /**
-     * ProductSave constructor.
-     *
-     * @param CustomDescriptionBatchProcessor $descBatchProcessor
-     * @param ManagerInterface $messageManager
-     * @param AdapterFactory $adapterFactory
-     * @param UploaderFactory $uploader
-     * @param Filesystem $filesystem
-     * @param RequestInterface $request
-     * @param Registry $registry
-     * @param CustomDescriptionFactory $customDescFactory
-     * @param CustomDescriptionRepositoryInterface $customDescRepo
-     * @param Data $helper
-     * @param File $file
-     *
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
@@ -103,6 +99,7 @@ class ProductSave
         Filesystem $filesystem,
         RequestInterface $request,
         Registry $registry,
+        ProductMetadataInterface $productMetadata,
         CustomDescriptionFactory $customDescFactory,
         CustomDescriptionRepositoryInterface $customDescRepo,
         Data $helper,
@@ -114,6 +111,7 @@ class ProductSave
         $this->filesystem = $filesystem;
         $this->request = $request;
         $this->registry = $registry;
+        $this->productMetadata = $productMetadata;
         $this->customDescriptionFactory = $customDescFactory;
         $this->customDescRepo = $customDescRepo;
         $this->helper = $helper;
@@ -122,13 +120,9 @@ class ProductSave
     }
 
     /**
-     * @param Save $subject
-     * @param $result
-     * @return mixed
-     *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function afterExecute(Save $subject, $result)
+    public function afterExecute(Save $subject, Redirect $result): Redirect
     {
         $product = $this->registry->registry('current_product');
         $params = $this->request->getParams();
@@ -136,20 +130,39 @@ class ProductSave
             ? $params['product']['descriptions']
             : false;
 
-        if (empty($product) || !is_array($customDescData)) {
+        if (empty($product)) {
             return $result;
         }
 
-        $productId = $product->getId();
+        $productId = (int) $product->getId();
+        $customDescCollection = $this->customDescRepo->getCustomDescriptionByProductId($productId);
+        $customDescCollectionSize = $customDescCollection->getSize();
+
+        if (!is_array($customDescData) && !$customDescCollectionSize) {
+            return $result;
+        }
+
+        if (!is_array($customDescData)) {
+            $this->removeAllItems($customDescCollection);
+            return $result;
+        }
+
+        if ($customDescCollectionSize) {
+            $customDescData = $this->getMappedCustomDescData($customDescData);
+            $customDescCollection = $this->getMappedCustomDescCollection($customDescCollection);
+            $this->removeToDeleteItems($customDescData, $customDescCollection);
+        }
 
         foreach ($customDescData as $detDesc) {
-            if (!$this->validateCustomDescData($detDesc)) {
+            if (!$this->validateCustomDescData($detDesc)
+                || ($customDescCollectionSize && !$this->hasItemChanged($detDesc, $customDescCollection))
+            ) {
                 continue;
             }
 
             $item = $this->initItem($detDesc);
 
-            if ($this->removeOrExcludeInvalidItem($item, $detDesc)) {
+            if ($this->excludeInvalidItem($item, $detDesc)) {
                 continue;
             }
 
@@ -163,10 +176,9 @@ class ProductSave
     }
 
     /**
-     * @param CustomDescriptionInterface $item
      * @throws \Magento\Framework\Exception\FileSystemException
      */
-    private function removeImageFromItem(CustomDescriptionInterface $item)
+    private function removeImageFromItem(CustomDescriptionInterface $item): void
     {
         if ($this->helper->isExistingImage($item->getImage())) {
             $fullPath = $this->helper->getImageFullPath($item->getImage());
@@ -176,23 +188,15 @@ class ProductSave
 
     /**
      * Validate description data
-     *
-     * @param $customDescData
-     *
-     * @return bool
      */
-    private function validateCustomDescData($customDescData)
+    private function validateCustomDescData(array $customDescData): bool
     {
         return $customDescData
             && !empty($customDescData['description'])
             && !empty($customDescData['title']);
     }
 
-    /**
-     * @param $item
-     * @return \Exception
-     */
-    private function removeItem($item)
+    private function removeItem(CustomDescriptionInterface $item): void
     {
         try {
             $this->removeImageFromItem($item);
@@ -203,14 +207,11 @@ class ProductSave
         }
     }
 
-    /**
-     * @param $item
-     * @param $detDesc
-     * @param $productId
-     * @return \Snowdog\CustomDescription\Api\Data\CustomDescriptionInterface
-     */
-    private function setItemData(CustomDescriptionInterface $item, $detDesc, $productId)
-    {
+    private function setItemData(
+        CustomDescriptionInterface $item,
+        array $detDesc,
+        int $productId
+    ): CustomDescriptionInterface {
         $sortOrder = isset($detDesc['position']) ? $detDesc['position'] : 0;
         $file = isset($detDesc['file'][0]['file']) ? $detDesc['file'][0]['file'] : false;
         $item->setData(CustomDescriptionInterface::DESCRIPTION, $detDesc['description']);
@@ -225,11 +226,7 @@ class ProductSave
         return $item;
     }
 
-    /**
-     * @param $detDesc
-     * @return CustomDescriptionInterface
-     */
-    private function initItem($detDesc)
+    private function initItem(array $detDesc): CustomDescriptionInterface
     {
         if (empty($detDesc['entity_id'])) {
             return $this->customDescriptionFactory->create();
@@ -238,18 +235,8 @@ class ProductSave
         return $this->customDescRepo->get($detDesc['entity_id']);
     }
 
-    /**
-     * @param CustomDescriptionInterface $item
-     * @param $detDesc
-     * @return bool
-     */
-    private function removeOrExcludeInvalidItem(CustomDescriptionInterface $item, $detDesc)
+    private function excludeInvalidItem(CustomDescriptionInterface $item, array $detDesc): bool
     {
-        if (!empty($item->getId()) && !empty($detDesc['is_delete'])) {
-            $this->removeItem($item);
-            return true;
-        }
-
         if (empty($detDesc['file']) && empty($item->getId())) {
             $this->messageManager
                 ->addErrorMessage(
@@ -259,5 +246,55 @@ class ProductSave
         }
 
         return false;
+    }
+
+    private function removeAllItems(CustomDescriptionInterface $customDescriptionCollection): void
+    {
+        foreach ($customDescriptionCollection as $item) {
+            $this->removeItem($item);
+        }
+    }
+
+    private function removeToDeleteItems(array $customDescData, array $customDescriptionCollection): void
+    {
+        foreach ($customDescriptionCollection as $item) {
+            if (!isset($customDescData[$item->getId()])) {
+                $this->removeItem($item);
+            }
+        }
+    }
+
+    private function getMappedCustomDescData(array $customDescData): array
+    {
+        $data = [];
+        foreach ($customDescData as $item) {
+            $data[$item['entity_id']] = $item;
+        }
+
+        return $data;
+    }
+
+    private function getMappedCustomDescCollection(CustomDescriptionCollection $customDescCollection): array
+    {
+        $collection = [];
+        foreach ($customDescCollection as $item) {
+            $collection[$item->getId()] = $item;
+        }
+
+        return $collection;
+    }
+
+    private function hasItemChanged(array $item, array $customDescCollection): bool
+    {
+        if (empty($item['file'])) {
+            return true;
+        }
+
+        $storeItem = $customDescCollection[$item['entity_id']];
+
+        return $storeItem->getTitle() != $item['title']
+            || $storeItem->getDescription() != $item['description']
+            || $storeItem->getImage() != $item['file'][0]['file']
+            || $storeItem->getPosition() != $item['position'];
     }
 }
