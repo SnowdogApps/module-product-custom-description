@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [2.2.1] 17-02-2021
+
 * Prevent new description items changes validation in product save plugin
 
 ## [2.2.0] 04-01-2021
