@@ -248,7 +248,7 @@ class CustomDescription extends AbstractModifier
                                 'sortOrder' => 20,
                                 'actions' => [
                                     [
-                                        'targetName' => 'ns = ${ $.ns }, index = ' . static::GRID_DESCRIPTION_NAME,
+                                        'targetName' => 'index = ' . static::GRID_DESCRIPTION_NAME,
                                         'actionName' => 'processingAddChild',
                                     ]
                                 ]
@@ -497,7 +497,7 @@ class CustomDescription extends AbstractModifier
                         'elementTmpl' => 'Magento_Downloadable/components/file-uploader',
                         'fileInputName' => 'image',
                         'uploaderConfig' => [
-                            'url' => $this->urlBuilder->addSessionParam()->getUrl(
+                            'url' => $this->urlBuilder->getUrl(
                                 'snowcustomdescription/file/upload',
                                 ['_secure' => true]
                             ),
