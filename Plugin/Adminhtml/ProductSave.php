@@ -286,7 +286,7 @@ class ProductSave
 
     private function hasItemChanged(array $item, array $customDescCollection): bool
     {
-        if (empty($item['file'])) {
+        if (empty($item['file']) || empty($item['entity_id'])) {
             return true;
         }
 
